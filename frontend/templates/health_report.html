@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Health Report — MediVision AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0d9488;--teal-light:#5eead4;--cyan:#06b6d4;--slate-900:#0f172a;--slate-800:#1e293b;--slate-400:#94a3b8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--slate-900);color:#fff;font-family:'DM Sans',sans-serif;min-height:100vh;}
+.topbar{padding:14px 24px;border-bottom:1px solid rgba(94,234,212,.1);display:flex;align-items:center;justify-content:space-between;background:rgba(30,41,59,.8);}
+.back-btn{color:var(--teal-light);font-size:14px;text-decoration:none;}
+.download-btn{background:var(--teal);color:#fff;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.container{max-width:900px;margin:0 auto;padding:32px 24px;}
+.report-header{background:linear-gradient(135deg,rgba(13,148,136,.2),rgba(6,182,212,.1));border:1px solid rgba(13,148,136,.3);border-radius:20px;padding:32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start;}
+h1{font-family:'Clash Display',sans-serif;font-size:28px;margin-bottom:6px;}
+.report-meta{font-size:13px;color:var(--slate-400);}
+.score-big{text-align:center;}
+.score-big .num{font-family:'Clash Display',sans-serif;font-size:56px;font-weight:700;color:var(--teal-light);line-height:1;}
+.score-big .label{font-size:13px;color:var(--slate-400);margin-top:4px;}
+.score-big .level{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;margin-top:8px;}
+.card{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:16px;padding:24px;margin-bottom:18px;}
+.card-title{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.vital-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(94,234,212,.06);}
+.vital-row:last-child{border-bottom:none;}
+.vital-name{font-size:14px;color:var(--slate-400);}
+.vital-val{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:700;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;}
+.badge.normal{background:rgba(34,197,94,.1);color:#86efac;border:1px solid rgba(34,197,94,.2);}
+.badge.warning{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.2);}
+.badge.critical{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2);}
+.recommendation{display:flex;gap:12px;padding:12px;border-radius:10px;background:rgba(15,23,42,.6);border:1px solid rgba(94,234,212,.08);margin-bottom:8px;}
+.rec-icon{font-size:22px;flex-shrink:0;}
+.rec-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.rec-text{font-size:13px;color:var(--slate-400);line-height:1.5;}
+</style>
+<script src="/static/theme.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+  <div style="font-family:'Clash Display',sans-serif;font-size:18px;">Health Report</div>
+  <button class="download-btn" onclick="window.print()">⬇️ Download PDF</button>
+</div>
+<div class="container">
+  <div class="report-header">
+    <div>
+      <h1>Health Report</h1>
+      <div class="report-meta">Generated: <strong id="reportDate"></strong></div>
+      <div class="report-meta" style="margin-top:4px;">Patient: <strong id="patientName">Demo User</strong></div>
+      <div class="report-meta">Report ID: <strong>RPT-2024-001</strong></div>
+    </div>
+    <div class="score-big">
+      <div class="num">78</div>
+      <div class="label">Overall Health Score</div>
+      <div class="level">● Good Health</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">❤️ Vital Signs</div>
+      <div class="vital-row"><span class="vital-name">Heart Rate</span><div style="text-align:right;"><span class="vital-val" style="color:var(--red)">73</span> <span style="font-size:12px;color:var(--slate-400)">bpm</span><br><div class="badge normal">Normal</div></div></div>
+      <div class="vital-row"><span class="vital-name">Blood Pressure</span><div style="text-align:right;"><span class="vital-val" style="color:var(--cyan)">120/80</span> <span style="font-size:12px;color:var(--slate-400)">mmHg</span><br><div class="badge normal">Normal</div></div></div>
+      <div class="vital-row"><span class="vital-name">SpO2</span><div style="text-align:right;"><span class="vital-val" style="color:var(--teal-light)">98</span> <span style="font-size:12px;color:var(--slate-400)">%</span><br><div class="badge normal">Excellent</div></div></div>
+      <div class="vital-row"><span class="vital-name">BMI</span><div style="text-align:right;"><span class="vital-val" style="color:var(--amber)">23.4</span><br><div class="badge normal">Healthy</div></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Health Breakdown</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(94,234,212,.1);">
+            <th style="text-align:left;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">Category</th>
+            <th style="text-align:right;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">Score</th>
+            <th style="text-align:right;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+            <td style="padding:12px 0;font-size:14px;">Vitals</td>
+            <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--teal-light)">85</span></td>
+            <td style="text-align:right;padding:12px 0;"><div class="badge normal">Excellent</div></td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+            <td style="padding:12px 0;font-size:14px;">Activity</td>
+            <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--teal-light)">70</span></td>
+            <td style="text-align:right;padding:12px 0;"><div class="badge warning">Good</div></td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+            <td style="padding:12px 0;font-size:14px;">Sleep</td>
+            <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--amber)">65</span></td>
+            <td style="text-align:right;padding:12px 0;"><div class="badge warning">Needs Attention</div></td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+            <td style="padding:12px 0;font-size:14px;">Nutrition</td>
+            <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--teal-light)">80</span></td>
+            <td style="text-align:right;padding:12px 0;"><div class="badge normal">Good</div></td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+            <td style="padding:12px 0;font-size:14px;">Mental Health</td>
+            <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--teal-light)">72</span></td>
+            <td style="text-align:right;padding:12px 0;"><div class="badge normal">Good</div></td>
+          </tr>
+          <tr>
+            <td style="padding:12px 0;font-size:14px;">Hydration</td>
+            <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--amber)">68</span></td>
+            <td style="text-align:right;padding:12px 0;"><div class="badge warning">Needs Attention</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 Vitals Trend (7 Days)</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.1);">
+          <th style="text-align:left;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">Day</th>
+          <th style="text-align:right;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">Heart Rate</th>
+          <th style="text-align:right;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">BP Systolic</th>
+          <th style="text-align:right;padding:12px 0;font-size:14px;color:var(--slate-400);font-weight:600;">BP Diastolic</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">Monday</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">72</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">120</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">80</span> mmHg</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">Tuesday</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">75</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">118</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">78</span> mmHg</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">Wednesday</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">70</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">122</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">82</span> mmHg</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">Thursday</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">74</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">119</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">79</span> mmHg</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">Friday</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">76</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">121</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">81</span> mmHg</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">Saturday</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">71</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">117</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">77</span> mmHg</td>
+        </tr>
+        <tr>
+          <td style="padding:12px 0;font-size:14px;font-weight:600;">Today</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">73</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">120</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">80</span> mmHg</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧠 AI Recommendations</div>
+    <div class="recommendation"><div class="rec-icon">💧</div><div><div class="rec-title">Increase Water Intake</div><div class="rec-text">Your hydration levels are slightly below optimal. Aim for 8-10 glasses of water daily to maintain kidney function and energy levels.</div></div></div>
+    <div class="recommendation"><div class="rec-icon">😴</div><div><div class="rec-title">Improve Sleep Quality</div><div class="rec-text">Your sleep score is 65/100. Try maintaining a fixed sleep schedule of 7-9 hours. Avoid screens 1 hour before bedtime.</div></div></div>
+    <div class="recommendation"><div class="rec-icon">🏃</div><div><div class="rec-title">Regular Physical Activity</div><div class="rec-text">30 minutes of moderate exercise 5 days a week significantly improves cardiovascular health and mental wellbeing.</div></div></div>
+    <div class="recommendation"><div class="rec-icon">🥗</div><div><div class="rec-title">Balanced Nutrition</div><div class="rec-text">Include more green vegetables, lean proteins, and whole grains. Reduce processed foods and added sugars.</div></div></div>
+    <div class="recommendation"><div class="rec-icon">📅</div><div><div class="rec-title">Annual Health Checkup</div><div class="rec-text">Schedule a comprehensive blood panel including CBC, thyroid, lipid profile, and blood glucose for proactive health management.</div></div></div>
+  </div>
+
+  <div style="text-align:center;font-size:12px;color:var(--slate-400);padding:20px;border-top:1px solid rgba(94,234,212,.1);margin-top:8px;">
+    This report is AI-generated and for informational purposes only. Consult a qualified healthcare professional for medical decisions.<br>
+    <strong style="color:var(--teal-light)">MediVision AI</strong> · AI-Powered Smart Healthcare System · Generated on <span id="footerDate"></span>
+  </div>
+</div>
+
+<script>
+async function generateDynamicReport() {
+  const token = localStorage.getItem('medivision_token');
+  if(!token) { window.location.href='/login'; return; }
+
+  try {
+    const res = await fetch('/api/dashboard/overview', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const d = await res.json();
+    if(!d.success) return;
+    
+    const data = d.data;
+    const user = data.user || {};
+    
+    document.getElementById('patientName').textContent = user.full_name || 'Demo User';
+    
+    const now = new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('reportDate').textContent = now;
+    document.getElementById('footerDate').textContent = now;
+    
+    document.getElementById('reportId').textContent = 'RPT-' + Math.random().toString(36).substr(2,6).toUpperCase();
+    
+    // Overall score
+    const score = user.health_score || 75;
+    document.querySelector('.score-big .num').textContent = score;
+    document.querySelector('.score-big .level').innerHTML = score > 80 ? '● Excellent Health' : score > 60 ? '● Good Health' : '● Needs Attention';
+    document.querySelector('.score-big .level').style.color = score > 80 ? '#86efac' : score > 60 ? '#fcd34d' : '#fca5a5';
+    
+    // Vitals block
+    const vitals = data.vitals_history || [];
+    if(vitals.length > 0) {
+      const latest = vitals[0];
+      const rows = document.querySelectorAll('.vital-row');
+      
+      // Heart Rate
+      if(latest.heart_rate) {
+        rows[0].querySelector('.vital-val').textContent = latest.heart_rate;
+        rows[0].querySelector('.badge').textContent = latest.heart_rate < 100 && latest.heart_rate > 50 ? 'Normal' : 'Check';
+        rows[0].querySelector('.badge').className = latest.heart_rate < 100 && latest.heart_rate > 50 ? 'badge normal' : 'badge warning';
+      }
+      
+      // Blood Pressure
+      if(latest.blood_pressure_sys) {
+        rows[1].querySelector('.vital-val').textContent = `${latest.blood_pressure_sys}/${latest.blood_pressure_dia || '-'}`;
+        rows[1].querySelector('.badge').textContent = latest.blood_pressure_sys < 130 ? 'Normal' : 'Monitor';
+        rows[1].querySelector('.badge').className = latest.blood_pressure_sys < 130 ? 'badge normal' : 'badge warning';
+      }
+      
+      // SpO2
+      if(latest.oxygen_saturation) {
+        rows[2].querySelector('.vital-val').textContent = latest.oxygen_saturation;
+        rows[2].querySelector('.badge').textContent = latest.oxygen_saturation >= 95 ? 'Excellent' : 'Low';
+        rows[2].querySelector('.badge').className = latest.oxygen_saturation >= 95 ? 'badge normal' : 'badge warning';
+      }
+      
+      // BMI (calculate from weight if height exists, but weight is just weight for now in this UI)
+      if(latest.weight) {
+        rows[3].querySelector('.vital-val').textContent = latest.weight + ' kg';
+        rows[3].querySelector('span.vital-name').textContent = 'Weight';
+        rows[3].querySelector('.badge').textContent = 'Recorded';
+      }
+    }
+    
+    // Vitals Trend table
+    const tableBody = document.querySelector('table:nth-of-type(2) tbody'); // 2nd table
+    if(tableBody && vitals.length > 0) {
+      tableBody.innerHTML = vitals.map(v => {
+        const dStr = v.date || (v.recorded_at ? new Date(v.recorded_at).toLocaleDateString('en-US',{weekday:'long'}) : '-');
+        return `<tr style="border-bottom:1px solid rgba(94,234,212,.06);">
+          <td style="padding:12px 0;font-size:14px;">${dStr}</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--red)">${v.heart_rate||'-'}</span> bpm</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">${v.blood_pressure_sys||'-'}</span> mmHg</td>
+          <td style="text-align:right;padding:12px 0;"><span style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">${v.blood_pressure_dia||'-'}</span> mmHg</td>
+        </tr>`;
+      }).join('');
+    } else if (tableBody) {
+       tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--slate-400)">No vitals data available. Please log your vitals in the dashboard.</td></tr>';
+    }
+    
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+generateDynamicReport();
+</script>
+</body>
+</html>

@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — MediVision AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Chart.js removed: switched to table-based metrics -->
+<style>
+:root{--teal:#0d9488;--teal-dark:#0f766e;--teal-light:#5eead4;--cyan:#06b6d4;--slate-900:#0f172a;--slate-800:#1e293b;--slate-700:#334155;--slate-600:#475569;--slate-400:#94a3b8;--slate-200:#e2e8f0;--red:#ef4444;--amber:#f59e0b;--green:#22c55e;--purple:#8b5cf6;--sidebar-w:260px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--slate-900);color:#fff;font-family:'DM Sans',sans-serif;display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--slate-800);border-right:1px solid rgba(94,234,212,.1);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:50;transition:transform .3s;}
+.sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(94,234,212,.1);display:flex;align-items:center;gap:10px;}
+.brand-icon{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.brand-text{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;}
+.brand-text span{color:var(--teal-light);}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto;}
+.nav-section-label{font-size:10px;font-weight:700;color:var(--slate-600);letter-spacing:2px;text-transform:uppercase;padding:16px 8px 8px;margin-top:4px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;color:var(--slate-400);font-size:14px;font-weight:500;transition:all .2s;text-decoration:none;margin-bottom:2px;}
+.nav-item:hover{background:rgba(94,234,212,.06);color:#fff;}
+.nav-item.active{background:rgba(13,148,136,.15);color:var(--teal-light);border:1px solid rgba(13,148,136,.2);}
+.nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:2px 7px;border-radius:100px;font-weight:700;}
+.sidebar-user{padding:16px 20px;border-top:1px solid rgba(94,234,212,.1);display:flex;align-items:center;gap:12px;}
+.user-avatar{width:38px;height:38px;background:linear-gradient(135deg,var(--teal),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.user-name{font-size:14px;font-weight:600;}
+.user-role{font-size:11px;color:var(--slate-400);}
+.logout-btn{margin-left:auto;color:var(--slate-400);cursor:pointer;font-size:16px;transition:color .2s;}
+.logout-btn:hover{color:var(--red);}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{padding:16px 32px;border-bottom:1px solid rgba(94,234,212,.1);background:rgba(15,23,42,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.topbar-title{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.notif-btn{position:relative;width:38px;height:38px;border-radius:10px;background:var(--slate-700);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .2s;}
+.notif-btn:hover{background:var(--slate-600);}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--slate-800);}
+.health-score-pill{display:flex;align-items:center;gap:8px;background:rgba(13,148,136,.15);border:1px solid rgba(13,148,136,.3);border-radius:100px;padding:6px 16px;font-size:13px;}
+.score-val{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;color:var(--teal-light);}
+
+/* CONTENT */
+.content{padding:28px 32px;flex:1;}
+.page{display:none;animation:fadeIn .3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px;}
+.stat-card{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:16px;padding:22px;transition:all .3s;cursor:default;}
+.stat-card:hover{border-color:rgba(13,148,136,.3);transform:translateY(-2px);}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;}
+.stat-icon.teal{background:rgba(13,148,136,.15);}
+.stat-icon.cyan{background:rgba(6,182,212,.15);}
+.stat-icon.purple{background:rgba(139,92,246,.15);}
+.stat-icon.amber{background:rgba(245,158,11,.15);}
+.stat-val{font-family:'Clash Display',sans-serif;font-size:30px;font-weight:700;margin-bottom:4px;}
+.stat-label{font-size:13px;color:var(--slate-400);}
+.stat-change{font-size:12px;margin-top:8px;}
+.stat-change.up{color:var(--green);}
+.stat-change.down{color:var(--red);}
+
+/* CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:24px;}
+.card{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:16px;padding:24px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.card-title{font-family:'Clash Display',sans-serif;font-size:17px;font-weight:600;}
+.card-action{font-size:12px;color:var(--teal-light);cursor:pointer;text-decoration:none;}
+
+/* HEALTH SCORE RING */
+.score-ring-wrap{display:flex;flex-direction:column;align-items:center;}
+.score-ring{position:relative;width:160px;height:160px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-ring-num{font-family:'Clash Display',sans-serif;font-size:36px;font-weight:700;color:var(--teal-light);}
+.score-ring-label{font-size:11px;color:var(--slate-400);}
+.score-details{margin-top:20px;display:flex;flex-direction:column;gap:10px;width:100%;}
+.score-factor{display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+.score-bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;flex:1;margin:0 10px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:3px;background:var(--teal);}
+
+/* APPOINTMENTS */
+.appt-list{display:flex;flex-direction:column;gap:12px;}
+.appt-item{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(15,23,42,.6);border-radius:12px;border:1px solid rgba(94,234,212,.08);}
+.appt-avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--teal),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.appt-info{flex:1;}
+.appt-name{font-size:14px;font-weight:600;}
+.appt-spec{font-size:12px;color:var(--slate-400);}
+.appt-meta{text-align:right;}
+.appt-date{font-size:12px;color:var(--teal-light);font-weight:500;}
+.appt-time{font-size:12px;color:var(--slate-400);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;margin-top:4px;}
+.status-confirmed{background:rgba(34,197,94,.1);color:#86efac;border:1px solid rgba(34,197,94,.2);}
+.status-pending{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.2);}
+.status-cancelled{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2);}
+
+/* NOTIFICATIONS */
+.notif-list{display:flex;flex-direction:column;gap:10px;}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px;background:rgba(15,23,42,.5);border-radius:12px;border:1px solid rgba(94,234,212,.08);cursor:pointer;transition:border-color .2s;}
+.notif-item:hover{border-color:rgba(13,148,136,.3);}
+.notif-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.notif-icon.apt{background:rgba(13,148,136,.15);}
+.notif-icon.alert{background:rgba(239,68,68,.15);}
+.notif-icon.rx{background:rgba(139,92,246,.15);}
+.notif-text h4{font-size:13px;font-weight:600;margin-bottom:3px;}
+.notif-text p{font-size:12px;color:var(--slate-400);}
+.notif-time{margin-left:auto;font-size:11px;color:var(--slate-600);white-space:nowrap;}
+
+/* VITALS MINI */
+.vitals-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.vital-card{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;}
+.vital-label{font-size:11px;color:var(--slate-400);text-transform:uppercase;letter-spacing:1px;}
+.vital-val{font-family:'Clash Display',sans-serif;font-size:26px;font-weight:700;}
+.data-table{width:100%;border-collapse:collapse;background:rgba(15,23,42,.8);border:1px solid rgba(94,234,212,.1);margin-top:10px;}
+.data-table th,.data-table td{padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid rgba(94,234,212,.1);}
+.data-table th{color:var(--teal-light);text-transform:uppercase;font-size:11px;letter-spacing:1px;}
+.data-table tbody tr:hover{background:rgba(94,234,212,.07);}
+.vital-unit{font-size:12px;color:var(--slate-400);}
+.vital-status{font-size:11px;font-weight:600;}
+.vital-status.normal{color:var(--green);}
+.vital-status.warning{color:var(--amber);}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--teal);color:#fff;}
+.btn-primary:hover{background:var(--teal-dark);transform:translateY(-1px);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+
+/* QUICK ACTIONS */
+.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+.qa-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:10px;color:#fff;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .2s;text-decoration:none;}
+.qa-btn:hover{border-color:var(--teal);background:rgba(13,148,136,.1);}
+
+/* ALERTS BANNER */
+.alert-banner{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px;font-size:13px;}
+.alert-banner.hidden{display:none;}
+
+/* BOTTOM CHARTS ROW */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+
+/* SKIN ANALYSIS PAGE */
+.skin-layout{display:grid;grid-template-columns:1fr 400px;gap:18px;height:calc(100vh - 180px);min-height:480px;}
+.skin-video-panel{position:relative;background:#000;border-radius:16px;overflow:hidden;border:1px solid rgba(94,234,212,.1);}
+#skinWebcam{width:100%;height:100%;object-fit:cover;display:block;}
+#skinOverlay{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+.skin-camera-off{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at center,rgba(13,148,136,.06) 0%,var(--slate-900) 70%);}
+.skin-camera-off .sci{font-size:70px;opacity:.45;filter:grayscale(1);}
+.skin-camera-off h3{font-family:'Clash Display',sans-serif;font-size:20px;}
+.skin-camera-off p{font-size:13px;color:var(--slate-400);max-width:280px;text-align:center;line-height:1.7;}
+.skin-alert-overlay{position:absolute;bottom:0;left:0;right:0;padding:14px;display:flex;flex-direction:column;gap:8px;z-index:10;}
+.skin-chip{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500;backdrop-filter:blur(10px);animation:chipIn .3s ease;}
+@keyframes chipIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.skin-chip.success{background:rgba(34,197,94,.85);border:1px solid rgba(34,197,94,.5);}
+.skin-chip.info{background:rgba(13,148,136,.85);border:1px solid rgba(13,148,136,.5);}
+.skin-chip.danger{background:rgba(239,68,68,.85);border:1px solid rgba(239,68,68,.5);}
+.skin-chip .scx{margin-left:auto;cursor:pointer;opacity:.7;}
+.skin-right{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;}
+.skin-panel-top{padding:18px 20px 14px;border-bottom:1px solid rgba(94,234,212,.08);}
+.skin-panel-top h3{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;}
+.skin-panel-top p{font-size:12px;color:var(--slate-400);margin-top:3px;}
+.skin-live-bar{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(94,234,212,.06);background:rgba(15,23,42,.4);font-size:12px;color:var(--slate-400);}
+.skin-live-dot{width:8px;height:8px;border-radius:50%;background:var(--slate-600);transition:background .3s;}
+.skin-live-dot.active{background:#ef4444;animation:sdotPulse 1.2s infinite;}
+@keyframes sdotPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.skin-panel-body{flex:1;overflow-y:auto;padding:16px;}
+.skin-controls{padding:14px 16px;border-top:1px solid rgba(94,234,212,.1);display:flex;flex-direction:column;gap:8px;}
+.skin-ctrl-row{display:flex;gap:8px;}
+.scb{flex:1;padding:10px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.scb.primary{background:var(--teal);color:#fff;}.scb.primary:hover{background:var(--teal-dark);}
+.scb.primary:disabled{opacity:.5;cursor:not-allowed;}
+.scb.secondary{background:var(--slate-700);color:#fff;}.scb.secondary:hover{background:var(--slate-600);}
+.scb.danger{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2);}
+.scb.danger:hover{background:rgba(239,68,68,.2);}
+.sspin{width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:ssp .6s linear infinite;}
+@keyframes ssp{to{transform:rotate(360deg)}}
+.skin-score-wrap{text-align:center;padding:14px 0 18px;border-bottom:1px solid rgba(94,234,212,.08);margin-bottom:16px;}
+.skin-score-ring{width:120px;height:120px;position:relative;margin:0 auto 10px;}
+.skin-score-ring svg{transform:rotate(-90deg);}
+.skin-score-ring circle{transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);}
+.skin-score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.skin-score-num{font-family:'Clash Display',sans-serif;font-size:32px;font-weight:700;}
+.skin-score-lbl{font-size:10px;color:var(--slate-400);}
+.skin-score-tag{font-size:13px;font-weight:600;padding:4px 16px;border-radius:16px;display:inline-block;margin-top:6px;}
+.sst-good{background:rgba(34,197,94,.15);color:#86efac;}
+.sst-mod{background:rgba(245,158,11,.15);color:#fcd34d;}
+.sst-poor{background:rgba(239,68,68,.15);color:#fca5a5;}
+.skin-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.skin-meta-card{background:rgba(15,23,42,.7);border:1px solid rgba(94,234,212,.08);border-radius:10px;padding:9px 11px;}
+.smc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--slate-500);margin-bottom:3px;}
+.smc-val{font-size:13px;font-weight:600;color:#fff;}
+.skin-metric-section{margin-bottom:18px;}
+.skin-section-hd{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--slate-500);font-weight:600;margin-bottom:10px;}
+.skin-metric-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.skin-metric-name{font-size:11px;color:var(--slate-300);width:100px;flex-shrink:0;}
+.skin-metric-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;}
+.skin-metric-bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.skin-metric-val{font-size:11px;font-weight:600;width:36px;text-align:right;flex-shrink:0;}
+.skin-cond-item{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;border-radius:8px;margin-bottom:5px;border:1px solid;}
+.scond-mild{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2);color:#fcd34d;}
+.scond-moderate{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2);color:#fca5a5;}
+.skin-all-clear{text-align:center;padding:14px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;color:#86efac;font-size:12px;font-weight:500;}
+.skin-sug-item{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(94,234,212,.06);font-size:12px;color:var(--slate-300);}
+.skin-sug-item:last-child{border:none;}
+.skin-empty{text-align:center;padding:40px 16px;color:var(--slate-400);}
+.skin-empty .sei{font-size:52px;margin-bottom:12px;}
+.skin-empty p{font-size:13px;line-height:1.7;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(94,234,212,.2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(94,234,212,.4);}
+
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stats-grid{grid-template-columns:1fr 1fr}.vitals-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+<script src="/static/theme.js"></script>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🏥</div>
+    <div class="brand-text">Medi<span>Vision</span>AI</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">🏠</span>Dashboard</a>
+    <a class="nav-item" onclick="showPage('predict')"><span class="nav-icon">🧠</span>AI Prediction<span class="nav-badge">AI</span></a>
+    <a class="nav-item" onclick="showPage('vision')"><span class="nav-icon">🔬</span>Skin Analysis<span class="nav-badge">LIVE</span></a>
+    <a class="nav-item" href="/medibot"><span class="nav-icon">🤖</span>MediBot Chat</a>
+
+    <div class="nav-section-label">Health</div>
+    <a class="nav-item" onclick="showPage('appointments')"><span class="nav-icon">📅</span>Appointments</a>
+    <a class="nav-item" onclick="showPage('prescriptions')"><span class="nav-icon">💊</span>Prescriptions</a>
+    <a class="nav-item" onclick="showPage('vitals')"><span class="nav-icon">❤️</span>Vitals & Logs</a>
+    <a class="nav-item" href="/health-report"><span class="nav-icon">📋</span>Health Report</a>
+
+    <div class="nav-section-label">Account</div>
+    <a class="nav-item" onclick="showPage('payments')"><span class="nav-icon">💳</span>Payments</a>
+    <a class="nav-item" onclick="showPage('notifications')"><span class="nav-icon">🔔</span>Notifications<span class="nav-badge" id="notifCount">3</span></a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="userAvatar">A</div>
+    <div>
+      <div class="user-name" id="userName">Loading...</div>
+      <div class="user-role">Patient</div>
+    </div>
+    <span class="logout-btn" onclick="logout()" title="Logout">⏻</span>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-right">
+      <button class="notif-btn" onclick="showPage('notifications')">🔔<div class="notif-dot"></div></button>
+      <div class="health-score-pill">❤️ Health Score: <span class="score-val" id="topScore">78</span></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD PAGE ===== -->
+    <div class="page active" id="page-dashboard">
+      <div id="alertBanner" class="alert-banner hidden">
+        ⚠️ <strong>Fatigue Alert:</strong> You showed signs of fatigue in your last vision session. Consider taking a break.
+        <button style="margin-left:auto;background:transparent;border:none;color:#fca5a5;cursor:pointer" onclick="this.parentElement.classList.add('hidden')">✕</button>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <a class="qa-btn" onclick="showPage('predict')">🧠 AI Diagnose</a>
+        <a class="qa-btn" onclick="showPage('vision')">🔬 Skin Analysis</a>
+        <a class="qa-btn" href="/medibot">🤖 Ask MediBot</a>
+        <a class="qa-btn" onclick="showPage('appointments')">📅 Book Appointment</a>
+        <a class="qa-btn" onclick="generateReport()">📄 Download Report</a>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon teal">📅</div>
+          <div class="stat-val" id="statTotalAppts">—</div>
+          <div class="stat-label">Upcoming Appointments</div>
+          <div class="stat-change" id="statApptChange"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon cyan">💊</div>
+          <div class="stat-val" id="statRx">—</div>
+          <div class="stat-label">Active Prescriptions</div>
+          <div class="stat-change" id="statRxChange"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">🧠</div>
+          <div class="stat-val" id="statPredictions">—</div>
+          <div class="stat-label">AI Predictions Run</div>
+          <div class="stat-change" id="statPredChange"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">🔔</div>
+          <div class="stat-val" id="statAlerts">—</div>
+          <div class="stat-label">Unread Alerts</div>
+          <div class="stat-change" id="statAlertsChange"></div>
+        </div>
+      </div>
+
+      <!-- Vitals Mini -->
+      <div class="vitals-grid">
+        <div class="vital-card">
+          <div class="vital-label">Heart Rate</div>
+          <div class="vital-val" style="color:var(--red)" id="vitalHR">— <span class="vital-unit">bpm</span></div>
+          <div class="vital-status normal" id="vitalHRStatus">● —</div>
+        </div>
+        <div class="vital-card">
+          <div class="vital-label">Blood Pressure</div>
+          <div class="vital-val" style="color:var(--cyan)" id="vitalBP">—<span class="vital-unit">/—</span></div>
+          <div class="vital-status normal" id="vitalBPStatus">● —</div>
+        </div>
+        <div class="vital-card">
+          <div class="vital-label">SpO2</div>
+          <div class="vital-val" style="color:var(--teal-light)" id="vitalSPO2">—<span class="vital-unit">%</span></div>
+          <div class="vital-status normal" id="vitalSPO2Status">● —</div>
+        </div>
+        <div class="vital-card">
+          <div class="vital-label">Last Weight</div>
+          <div class="vital-val" style="color:var(--amber)" id="vitalWeight">—</div>
+          <div class="vital-status normal" id="vitalWeightStatus">● —</div>
+        </div>
+      </div>
+
+      <!-- Stats Row Replaced by Tables -->
+      <div class="charts-row">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Vitals This Week</div>
+            <span class="card-action" onclick="showPage('vitals')">View all →</span>
+          </div>
+          <table class="data-table" id="weeklyVitalsTable">
+            <thead>
+              <tr><th>Day</th><th>Heart Rate</th><th>BP Systolic</th><th>Oxygen</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Health Score</div></div>
+          <div class="score-ring-wrap">
+            <div class="score-ring">
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="65" fill="none" stroke="rgba(94,234,212,.1)" stroke-width="12"/>
+                <circle cx="80" cy="80" r="65" fill="none" stroke="url(#scoreGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="408" stroke-dashoffset="89" id="scoreCircle"/>
+                <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+              </svg>
+              <div class="score-ring-val"><div class="score-ring-num" id="scoreNum">78</div><div class="score-ring-label">/ 100</div></div>
+            </div>
+            <div class="score-details" style="padding:0 8px;">
+              <div class="score-factor"><span style="font-size:12px">Vitals</span><div class="score-bar"><div class="score-bar-fill" style="width:85%;background:var(--green)"></div></div><span style="font-size:12px;color:var(--green)">85</span></div>
+              <div class="score-factor"><span style="font-size:12px">Activity</span><div class="score-bar"><div class="score-bar-fill" style="width:70%"></div></div><span style="font-size:12px;color:var(--teal-light)">70</span></div>
+              <div class="score-factor"><span style="font-size:12px">Sleep</span><div class="score-bar"><div class="score-bar-fill" style="width:65%;background:var(--amber)"></div></div><span style="font-size:12px;color:var(--amber)">65</span></div>
+              <div class="score-factor"><span style="font-size:12px">Nutrition</span><div class="score-bar"><div class="score-bar-fill" style="width:80%"></div></div><span style="font-size:12px;color:var(--teal-light)">80</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="bottom-row">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Upcoming Appointments</div><span class="card-action" onclick="showPage('appointments')">Book new →</span></div>
+          <div class="appt-list" id="dashApptList">
+            <div style="color:var(--slate-400);font-size:13px;padding:16px;text-align:center;">Loading...</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent Notifications</div><span class="card-action" onclick="showPage('notifications')">All →</span></div>
+          <div class="notif-list" id="dashNotifList">
+            <div style="color:var(--slate-400);font-size:13px;padding:16px;text-align:center;">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AI PREDICT PAGE ===== -->
+    <div class="page" id="page-predict">
+      <div style="max-width:900px;">
+        <p style="color:var(--slate-400);margin-bottom:24px;font-size:15px;">Enter your symptoms to get AI-powered disease predictions with probability scores and precautions.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div>
+            <div class="card" style="margin-bottom:18px;">
+              <div class="card-title" style="margin-bottom:16px;">🎤 Voice Input</div>
+              <button class="btn btn-primary" onclick="startVoice()" id="voiceBtn" style="width:100%;margin-bottom:10px;">🎙️ Speak Symptoms</button>
+              <div id="voiceStatus" style="font-size:13px;color:var(--slate-400);text-align:center;min-height:20px;"></div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:16px;">📝 Select Symptoms</div>
+              <input type="text" id="symptomSearch" placeholder="Type to search symptoms..." onkeyup="filterSymptoms()" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px 14px;color:#fff;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;">
+              <div id="symptomTags" style="display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
+              <div id="selectedSymptoms" style="margin-bottom:14px;">
+                <div style="font-size:12px;color:var(--slate-400);margin-bottom:8px;">Selected:</div>
+                <div id="selectedList" style="display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:8px;background:var(--slate-900);border-radius:8px;border:1px solid rgba(94,234,212,.1);"></div>
+              </div>
+              <button class="btn btn-primary" onclick="runPrediction()" style="width:100%;" id="predictBtn">🧠 Analyze Symptoms</button>
+            </div>
+          </div>
+          <div class="card" id="resultsCard">
+            <div class="card-title" style="margin-bottom:16px;">🔬 AI Analysis Results</div>
+            <div id="resultsContent" style="color:var(--slate-400);text-align:center;padding:40px 20px;">
+              <div style="font-size:40px;margin-bottom:12px;">🔍</div>
+              <p>Select symptoms and click Analyze to get AI predictions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== APPOINTMENTS PAGE ===== -->
+    <div class="page" id="page-appointments">
+      <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="flex:1;min-width:300px;">
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-title" style="margin-bottom:16px;">🔍 Find a Doctor</div>
+            <select id="specialtyFilter" onchange="filterDoctors()" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;">
+              <option value="">All Specialties</option>
+              <option>Cardiologist</option><option>Neurologist</option><option>Dermatologist</option>
+              <option>General Physician</option><option>Gynecologist</option><option>Orthopedic</option>
+            </select>
+            <div id="doctorList"></div>
+          </div>
+        </div>
+        <div style="width:320px;">
+          <div class="card" id="bookingCard" style="display:none;">
+            <div class="card-title" style="margin-bottom:16px;">📅 Book Appointment</div>
+            <div id="selectedDoctorInfo" style="padding:12px;background:rgba(13,148,136,.1);border-radius:10px;margin-bottom:16px;font-size:13px;"></div>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">Select Date</label>
+              <input type="date" id="aptDate" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;">
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">Select Time</label>
+              <div id="timeSlots" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">Reason for Visit</label>
+              <textarea id="aptReason" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;resize:none;height:70px;" placeholder="Describe your symptoms..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="bookAppointment()" style="width:100%;">💳 Proceed to Payment</button>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">Your Appointments</div>
+            <div class="appt-list" id="myApptList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PRESCRIPTIONS PAGE ===== -->
+    <div class="page" id="page-prescriptions">
+      <div id="prescriptionsList"></div>
+    </div>
+
+    <!-- ===== VITALS PAGE ===== -->
+    <div class="page" id="page-vitals">
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-title" style="margin-bottom:16px;">📊 Log Today's Vitals</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:16px;">
+          <div><label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">Heart Rate (bpm)</label><input type="number" id="v_hr" placeholder="72" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;"></div>
+          <div><label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">BP Systolic</label><input type="number" id="v_bps" placeholder="120" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;"></div>
+          <div><label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">BP Diastolic</label><input type="number" id="v_bpd" placeholder="80" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;"></div>
+          <div><label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">SpO2 (%)</label><input type="number" id="v_spo2" placeholder="98" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;"></div>
+          <div><label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">Weight (kg)</label><input type="number" id="v_weight" placeholder="65" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;"></div>
+          <div><label style="font-size:12px;color:var(--slate-400);display:block;margin-bottom:6px;">Temperature (°C)</label><input type="number" id="v_temp" placeholder="36.5" step="0.1" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'DM Sans',sans-serif;"></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveVitals()">💾 Save Vitals</button>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">📈 Vitals Trends (Last 7 Days)</div>
+        <table class="data-table" id="vitalsTrendTable">
+          <thead>
+            <tr><th>Day</th><th>Heart Rate</th><th>BP Systolic</th><th>Oxygen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== NOTIFICATIONS PAGE ===== -->
+    <div class="page" id="page-notifications">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:20px;">🔔 All Notifications</div>
+        <div class="notif-list" id="allNotifList">
+          <div style="color:var(--slate-400);font-size:13px;padding:16px;text-align:center;">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAYMENTS PAGE ===== -->
+    <div class="page" id="page-payments">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:20px;">💳 Payment History</div>
+        <div id="paymentList"></div>
+      </div>
+    </div>
+
+    <!-- ===== SKIN ANALYSIS PAGE ===== -->
+    <div class="page" id="page-vision">
+      <div class="skin-layout">
+        <!-- Camera Feed -->
+        <div class="skin-video-panel">
+          <video id="skinWebcam" autoplay muted playsinline></video>
+          <img id="skinOverlay" alt="">
+          <div class="skin-camera-off" id="skinCameraOff">
+            <div class="sci">🔬</div>
+            <h3>AI Skin Analysis</h3>
+            <p>Start your camera, position your face clearly in the frame, then click <strong>Analyze Skin</strong> for a full skin health report.</p>
+          </div>
+          <div class="skin-alert-overlay" id="skinAlertOverlay"></div>
+        </div>
+        <!-- Results Panel -->
+        <div class="skin-right">
+          <div class="skin-panel-top">
+            <h3>🔬 Skin Health Report</h3>
+            <p>Real-time AI-powered skin analysis</p>
+          </div>
+          <div class="skin-live-bar">
+            <div class="skin-live-dot" id="skinLiveDot"></div>
+            <span id="skinLiveText">Camera Off</span>
+            <span style="margin-left:auto" id="skinSessionTimer">Session: 00:00</span>
+          </div>
+          <div class="skin-panel-body" id="skinPanelBody">
+            <div class="skin-empty">
+              <div class="sei">🧬</div>
+              <p>Start the camera and click <strong>Analyze Skin</strong> to receive your personalised skin health report.</p>
+            </div>
+          </div>
+          <div class="skin-controls">
+            <div class="skin-ctrl-row">
+              <button class="scb primary" onclick="skinStartCamera()" id="skinStartBtn">📷 Start Camera</button>
+              <button class="scb primary" onclick="skinAnalyze()" id="skinAnalyzeBtn" disabled>🔬 Analyze Skin</button>
+            </div>
+            <div class="skin-ctrl-row">
+              <button class="scb secondary" onclick="skinToggleAuto()" id="skinAutoBtn">▶️ Auto Scan</button>
+              <button class="scb danger" onclick="skinStop()">⏹️ Stop</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div id="paymentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--slate-800);border:1px solid rgba(94,234,212,.2);border-radius:20px;padding:36px;max-width:440px;width:90%;max-height:90vh;overflow-y:auto;">
+    <h3 style="font-family:'Clash Display',sans-serif;font-size:22px;margin-bottom:8px;">💳 Complete Payment</h3>
+    <div id="payAmount" style="font-size:28px;font-weight:700;color:var(--teal-light);margin-bottom:20px;font-family:'Clash Display',sans-serif;"></div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn btn-sm btn-primary" onclick="selectPayMethod('upi')">📱 UPI</button>
+      <button class="btn btn-sm" style="background:var(--slate-700);color:#fff;" onclick="selectPayMethod('card')">💳 Card</button>
+      <button class="btn btn-sm" style="background:var(--slate-700);color:#fff;" onclick="selectPayMethod('netbanking')">🏦 Net Banking</button>
+      <button class="btn btn-sm" style="background:var(--slate-700);color:#fff;" onclick="selectPayMethod('wallet')">👛 Wallet</button>
+    </div>
+    <div id="payMethodFields"></div>
+    <button class="btn btn-primary" onclick="processPayment()" style="width:100%;margin-top:16px;" id="payNowBtn">Pay Now</button>
+    <button class="btn" onclick="closePayModal()" style="width:100%;margin-top:10px;background:transparent;border:1px solid rgba(94,234,212,.15);color:var(--slate-400);">Cancel</button>
+  </div>
+</div>
+
+
+<script>
+// ================================================================
+// MEDIVISION AI — DASHBOARD JS (per-user, dynamic data)
+// ================================================================
+
+const token = localStorage.getItem('medivision_token');
+
+// Redirect to login if no token
+if (!token) { window.location.href = '/login'; }
+
+let currentUser = {};
+let allDoctors = [];
+let selectedDoctor = null;
+let selectedTime = null;
+
+// ---- INIT ----
+async function loadDashboard() {
+  if (!token) return;
+
+  try {
+    const res = await fetch('/api/dashboard/overview', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    // Only redirect to login on explicit 401 — not on network errors
+    if (res.status === 401) {
+      localStorage.clear();
+      window.location.href = '/login';
+      return;
+    }
+
+    const d = await res.json();
+    if (!d.success) {
+      showErrorBanner(d.error || 'Could not load dashboard data.');
+      return;
+    }
+
+    const data = d.data;
+    currentUser = data.user || {};
+    localStorage.setItem('medivision_user', JSON.stringify(currentUser));
+
+    // ── User identity ──
+    document.getElementById('userName').textContent = currentUser.full_name || 'Patient';
+    document.getElementById('userAvatar').textContent = (currentUser.full_name || 'P')[0].toUpperCase();
+
+    // ── Health score ──
+    const score = currentUser.health_score || 75;
+    document.getElementById('topScore').textContent = score;
+    document.getElementById('scoreNum').textContent = score;
+    const circumference = 2 * Math.PI * 65;
+    const offset = circumference - (score / 100) * circumference;
+    const circle = document.getElementById('scoreCircle');
+    if (circle) circle.style.strokeDashoffset = offset;
+
+    // ── Stat cards ──
+    const stats = data.stats || {};
+    const safeSet = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    safeSet('statTotalAppts', stats.total_appointments ?? 0);
+    safeSet('statRx', stats.prescriptions ?? 0);
+    safeSet('statPredictions', stats.total_predictions ?? 0);
+    safeSet('statAlerts', stats.alerts ?? 0);
+    safeSet('statApptChange', stats.appointments_today > 0 ? `↑ ${stats.appointments_today} today` : 'None today');
+    safeSet('statRxChange', stats.prescriptions > 0 ? 'From your doctors' : 'No active prescriptions');
+    safeSet('statPredChange', stats.total_predictions > 0 ? 'AI-powered analysis' : 'Try AI Prediction');
+    safeSet('statAlertsChange', stats.alerts > 0 ? `${stats.alerts} unread` : 'All caught up ✓');
+
+    // ── Vitals mini-grid (show most recent entry) ──
+    const vitals = data.vitals_history || [];
+    if (vitals.length > 0) {
+      const latest = vitals[0];
+      if (latest.heart_rate) {
+        document.getElementById('vitalHR').innerHTML = `${latest.heart_rate} <span class="vital-unit">bpm</span>`;
+        document.getElementById('vitalHRStatus').textContent = latest.heart_rate < 100 && latest.heart_rate > 50 ? '● Normal' : '● Check';
+      } else {
+        document.getElementById('vitalHR').innerHTML = `— <span class="vital-unit">bpm</span>`;
+        document.getElementById('vitalHRStatus').textContent = '● No data';
+      }
+      if (latest.blood_pressure_sys) {
+        document.getElementById('vitalBP').innerHTML = `${latest.blood_pressure_sys}<span class="vital-unit">/${latest.blood_pressure_dia || '?'}</span>`;
+        document.getElementById('vitalBPStatus').textContent = latest.blood_pressure_sys < 130 ? '● Normal' : '● Monitor';
+      } else {
+        document.getElementById('vitalBP').innerHTML = `—<span class="vital-unit">/—</span>`;
+        document.getElementById('vitalBPStatus').textContent = '● No data';
+      }
+      if (latest.oxygen_saturation) {
+        document.getElementById('vitalSPO2').innerHTML = `${latest.oxygen_saturation}<span class="vital-unit">%</span>`;
+        document.getElementById('vitalSPO2Status').textContent = latest.oxygen_saturation >= 95 ? '● Excellent' : '● Low';
+      } else {
+        document.getElementById('vitalSPO2').innerHTML = `—<span class="vital-unit">%</span>`;
+        document.getElementById('vitalSPO2Status').textContent = '● No data';
+      }
+      if (latest.weight) {
+        document.getElementById('vitalWeight').innerHTML = `${latest.weight} <span class="vital-unit">kg</span>`;
+        document.getElementById('vitalWeightStatus').textContent = '● Recorded';
+      } else {
+        document.getElementById('vitalWeight').innerHTML = `—`;
+        document.getElementById('vitalWeightStatus').textContent = '● No data';
+      }
+    } else {
+      // No vitals yet — show prompts
+      ['vitalHR','vitalBP','vitalSPO2','vitalWeight'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = id === 'vitalBP' ? `—<span class="vital-unit">/—</span>` : (id === 'vitalHR' ? `— <span class="vital-unit">bpm</span>` : (id === 'vitalSPO2' ? `—<span class="vital-unit">%</span>` : '—'));
+      });
+      ['vitalHRStatus','vitalBPStatus','vitalSPO2Status','vitalWeightStatus'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = '● Log first reading';
+      });
+    }
+
+    // ── Weekly vitals table ──
+    const tbody = document.querySelector('#weeklyVitalsTable tbody');
+    if (tbody) {
+      if (vitals.length > 0) {
+        tbody.innerHTML = vitals.map(v => {
+          const label = v.date || (v.recorded_at ? new Date(v.recorded_at).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}) : '-');
+          return `<tr><td>${label}</td><td>${v.heart_rate || '-'} bpm</td><td>${v.blood_pressure_sys || '-'}</td><td>${v.oxygen_saturation || '-'}%</td></tr>`;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:var(--slate-400);text-align:center;padding:20px;">No vitals recorded yet. Log your first reading in Vitals & Logs!</td></tr>';
+      }
+    }
+
+    // ── Dashboard appointment overview ──
+    const apptList = document.getElementById('dashApptList');
+    if (apptList) {
+      const appointments = (data.appointments || []).filter(a => a.status !== 'cancelled');
+      if (appointments.length > 0) {
+        apptList.innerHTML = appointments.slice(0, 3).map(a => `
+          <div class="appt-item">
+            <div class="appt-avatar">👩‍⚕️</div>
+            <div class="appt-info"><div class="appt-name">${a.doctor_name || 'Doctor'}</div><div class="appt-spec">${a.specialty || 'General'}</div></div>
+            <div class="appt-meta"><div class="appt-date">${a.appointment_date || '-'}</div><div class="appt-time">${(a.appointment_time || '').slice(0,5)}</div><div class="status-badge status-${a.status || 'pending'}">● ${a.status || 'pending'}</div></div>
+          </div>`).join('');
+      } else {
+        apptList.innerHTML = '<div style="color:var(--slate-400);font-size:13px;padding:16px;text-align:center;">No upcoming appointments. <span style="color:var(--teal-light);cursor:pointer" onclick="showPage(\'appointments\')">Book one →</span></div>';
+      }
+    }
+
+    // ── Dashboard notifications preview ──
+    const dashNotifList = document.getElementById('dashNotifList');
+    const allNotifList = document.getElementById('allNotifList');
+    const notifications = data.notifications || [];
+    const notifHtml = notifications.length > 0
+      ? notifications.slice(0, 4).map(n => `
+          <div class="notif-item">
+            <div class="notif-icon ${n.type === 'appointment' ? 'apt' : n.type === 'prescription' ? 'rx' : 'alert'}">${n.type === 'appointment' ? '📅' : n.type === 'prescription' ? '💊' : '⚠️'}</div>
+            <div class="notif-text"><h4>${n.title || 'Notification'}</h4><p>${n.message || ''}</p></div>
+            <div class="notif-time">${n.created_at ? new Date(n.created_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'Just now'}</div>
+          </div>`).join('')
+      : '<div style="color:var(--slate-400);font-size:13px;padding:16px;text-align:center;">No notifications yet.</div>';
+    if (dashNotifList) dashNotifList.innerHTML = notifHtml;
+    if (allNotifList) allNotifList.innerHTML = notifHtml;
+
+    // Update notification badge
+    const unread = notifications.filter(n => !n.is_read).length;
+    const notifCountEl = document.getElementById('notifCount');
+    if (notifCountEl) notifCountEl.textContent = unread > 0 ? unread : '';
+
+  } catch (e) {
+    console.error('[Dashboard] Load error:', e);
+    showErrorBanner('Could not connect to server. Check your connection.');
+  }
+}
+
+function showErrorBanner(msg) {
+  const banner = document.getElementById('alertBanner');
+  if (banner) {
+    banner.innerHTML = `⚠️ ${msg} <button style="margin-left:auto;background:transparent;border:none;color:#fca5a5;cursor:pointer" onclick="this.parentElement.classList.add('hidden')">✕</button>`;
+    banner.classList.remove('hidden');
+  }
+}
+
+loadDashboard();
+
+// Set today as the minimum bookable date for the appointment date picker
+(function() {
+  const aptDateInput = document.getElementById('aptDate');
+  if (aptDateInput) {
+    aptDateInput.min = new Date().toISOString().split('T')[0];
+  }
+})();
+
+// ---- PAGE NAVIGATION ----
+function showPage(name) {
+  // Stop skin camera when leaving vision page
+  if (name !== 'vision' && skinStream) skinStop();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const titles = {dashboard:'Dashboard', predict:'AI Disease Prediction', appointments:'Appointments', prescriptions:'Prescriptions', vitals:'Vitals & Health Log', notifications:'Notifications', payments:'Payment History', vision:'Skin Analysis — Live'};
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  if (name === 'predict') initSymptoms();
+  if (name === 'appointments') loadDoctors();
+  if (name === 'prescriptions') loadPrescriptions();
+  if (name === 'payments') loadPayments();
+  if (name === 'vitals') initVitalsPage();
+}
+
+// ---- VITALS ----
+async function initVitalsPage() {
+  // Show real vitals trend from DB
+  try {
+    const res = await fetch('/api/dashboard/overview', { headers: {'Authorization':'Bearer '+token} });
+    const d = await res.json();
+    const vitals = (d.data && d.data.vitals_history) || [];
+    const tbody = document.querySelector('#vitalsTrendTable tbody');
+    if (!tbody) return;
+    if (vitals.length > 0) {
+      tbody.innerHTML = vitals.map(v => {
+        const label = v.date || (v.recorded_at ? new Date(v.recorded_at).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : '-');
+        return `<tr><td>${label}</td><td>${v.heart_rate||'-'} bpm</td><td>${v.blood_pressure_sys||'-'}</td><td>${v.oxygen_saturation||'-'}%</td></tr>`;
+      }).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--slate-400);text-align:center;padding:20px;">No vitals logged yet. Use the form below to add your first entry!</td></tr>';
+    }
+  } catch(e) { console.error('[Vitals]', e); }
+}
+
+async function saveVitals() {
+  const payload = {
+    heart_rate: document.getElementById('v_hr').value,
+    bp_systolic: document.getElementById('v_bps').value,
+    bp_diastolic: document.getElementById('v_bpd').value,
+    oxygen_saturation: document.getElementById('v_spo2').value,
+    weight: document.getElementById('v_weight').value,
+    temperature: document.getElementById('v_temp').value
+  };
+  if (!Object.values(payload).some(v => v)) { alert('Please enter at least one vital reading.'); return; }
+
+  try {
+    const res = await fetch('/api/dashboard/vitals', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showSuccessToast('✅ Vitals saved!');
+      // Clear fields
+      ['v_hr','v_bps','v_bpd','v_spo2','v_weight','v_temp'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      initVitalsPage(); // Refresh table
+      loadDashboard();  // Refresh dashboard stats
+    } else {
+      alert(data.error || 'Could not save vitals.');
+    }
+  } catch(e) {
+    alert('Connection error. Please try again.');
+  }
+}
+
+// ---- SYMPTOMS / AI PREDICTION ----
+const ALL_SYMPTOMS = ['fever','cough','headache','fatigue','nausea','vomiting','diarrhea','body aches','sore throat','runny nose','sneezing','chest pain','shortness of breath','dizziness','rash','itching','joint pain','muscle pain','high fever','weight loss','frequent urination','blurred vision','loss of taste','loss of smell','chills','sweating','pale skin','swollen ankles','heartburn','stomach cramps'];
+let selectedSymptoms = [];
+
+function initSymptoms() {
+  const container = document.getElementById('symptomTags');
+  container.innerHTML = ALL_SYMPTOMS.map(s =>
+    `<span onclick="toggleSymptom('${s}')" id="sym_${s.replace(/ /g,'_')}" style="padding:5px 12px;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:100px;font-size:12px;cursor:pointer;transition:all .2s;">${s}</span>`
+  ).join('');
+}
+
+function filterSymptoms() {
+  const q = document.getElementById('symptomSearch').value.toLowerCase();
+  document.querySelectorAll('#symptomTags span').forEach(s => {
+    s.style.display = s.textContent.includes(q) ? '' : 'none';
+  });
+}
+
+function toggleSymptom(s) {
+  const el = document.getElementById('sym_' + s.replace(/ /g,'_'));
+  if (selectedSymptoms.includes(s)) {
+    selectedSymptoms = selectedSymptoms.filter(x => x !== s);
+    el.style.background = 'var(--slate-900)'; el.style.borderColor = 'rgba(94,234,212,.15)'; el.style.color = '#fff';
+  } else {
+    selectedSymptoms.push(s);
+    el.style.background = 'rgba(13,148,136,.2)'; el.style.borderColor = 'var(--teal)'; el.style.color = 'var(--teal-light)';
+  }
+  renderSelectedSymptoms();
+}
+
+function renderSelectedSymptoms() {
+  document.getElementById('selectedList').innerHTML = selectedSymptoms.map(s =>
+    `<span style="padding:4px 12px;background:rgba(13,148,136,.2);border:1px solid var(--teal);border-radius:100px;font-size:12px;color:var(--teal-light);display:flex;align-items:center;gap:6px;">${s} <span onclick="toggleSymptom('${s}')" style="cursor:pointer;color:var(--slate-400);">✕</span></span>`
+  ).join('');
+}
+
+async function runPrediction() {
+  if (selectedSymptoms.length === 0) { alert('Please select at least one symptom'); return; }
+  const btn = document.getElementById('predictBtn');
+  btn.innerHTML = '⏳ Analyzing...'; btn.disabled = true;
+  document.getElementById('resultsContent').innerHTML = '<div style="text-align:center;padding:40px"><div style="width:40px;height:40px;border:3px solid rgba(94,234,212,.2);border-top-color:var(--teal);border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite"></div><p style="color:var(--slate-400)">AI analyzing symptoms...</p></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
+  try {
+    const res = await fetch('/api/ai/predict', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({symptoms: selectedSymptoms, user_id: currentUser.id})
+    });
+    const data = await res.json();
+    if (data.result) renderResults(data.result);
+    else document.getElementById('resultsContent').innerHTML = '<p style="color:var(--red);padding:20px;">Prediction failed. Please try again.</p>';
+  } catch(e) {
+    document.getElementById('resultsContent').innerHTML = '<p style="color:var(--red);padding:20px;">Connection error. Please try again.</p>';
+  }
+  btn.innerHTML = '🧠 Analyze Symptoms'; btn.disabled = false;
+}
+
+function renderResults(result) {
+  if (!result) return;
+  const colors = ['var(--red)','var(--amber)','var(--teal)'];
+  let html = `<div style="margin-bottom:20px;padding:14px;background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.2);border-radius:12px;font-size:13px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span>🏥 Health Risk Score</span>
+      <span style="font-family:'Clash Display',sans-serif;font-size:22px;color:${result.health_risk_score>60?'var(--red)':result.health_risk_score>30?'var(--amber)':'var(--green)'};">${result.health_risk_score}/100</span>
+    </div></div>`;
+  (result.predictions || []).forEach((p, i) => {
+    html += `<div style="padding:16px;border:1px solid rgba(94,234,212,.1);border-radius:12px;margin-bottom:12px;background:rgba(15,23,42,.5);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:600;font-size:15px;">${p.disease}</span>
+        <span style="font-size:12px;padding:3px 10px;border-radius:20px;background:rgba(94,234,212,.1);color:var(--teal-light);">${p.severity}</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin-bottom:10px;overflow:hidden;">
+        <div style="height:100%;width:${p.probability}%;background:${colors[i]||'var(--teal)'};border-radius:3px;transition:width 1s;"></div>
+      </div>
+      <div style="font-size:12px;color:var(--slate-400);margin-bottom:8px;">${p.description}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">${(p.precautions||[]).map(pr=>`<span style="font-size:11px;padding:2px 8px;background:rgba(94,234,212,.1);border-radius:100px;color:var(--teal-light);">${pr}</span>`).join('')}</div>
+    </div>`;
+  });
+  html += `<button onclick="window.location.href='/medibot'" class="btn btn-primary" style="width:100%;margin-top:8px;">🤖 Ask MediBot for advice</button>`;
+  document.getElementById('resultsContent').innerHTML = html;
+}
+
+function startVoice() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) { document.getElementById('voiceStatus').textContent = '❌ Voice not supported in this browser'; return; }
+  const recognition = new SpeechRec();
+  recognition.lang = 'en-IN'; recognition.interimResults = true;
+  document.getElementById('voiceBtn').innerHTML = '⏹️ Listening...';
+  document.getElementById('voiceStatus').textContent = '🎙️ Speak your symptoms...';
+  recognition.onresult = e => {
+    const transcript = Array.from(e.results).map(r=>r[0].transcript).join(' ').toLowerCase();
+    document.getElementById('voiceStatus').textContent = '📝 Heard: ' + transcript;
+    if (e.results[e.results.length-1].isFinal) {
+      ALL_SYMPTOMS.forEach(sym => { if(transcript.includes(sym) && !selectedSymptoms.includes(sym)) toggleSymptom(sym); });
+    }
+  };
+  recognition.onend = () => { document.getElementById('voiceBtn').innerHTML = '🎙️ Speak Symptoms'; };
+  recognition.start();
+}
+
+// ---- APPOINTMENTS ----
+async function loadDoctors() {
+  try {
+    const res = await fetch('/api/appointments/doctors');
+    const data = await res.json();
+    allDoctors = data.doctors || [];
+  } catch(e) {
+    allDoctors = [];
+  }
+  renderDoctors(allDoctors);
+  loadMyAppointments();
+}
+
+function renderDoctors(docs) {
+  const el = document.getElementById('doctorList');
+  if (!docs || docs.length === 0) {
+    el.innerHTML = '<div style="color:var(--slate-400);padding:16px;text-align:center;">No doctors available.</div>';
+    return;
+  }
+  el.innerHTML = docs.map(d => `
+    <div onclick="selectDoctor(${JSON.stringify(d).replace(/"/g,'&quot;')})" style="padding:14px;border:1px solid rgba(94,234,212,.1);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .2s;background:rgba(15,23,42,.5);" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='rgba(94,234,212,.1)'">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-weight:600;font-size:14px;margin-bottom:3px;">${d.name}</div>
+          <div style="font-size:12px;color:var(--teal-light);">${d.specialty}</div>
+          <div style="font-size:12px;color:var(--slate-400);">${d.experience}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:var(--amber);">⭐ ${d.rating}</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:16px;color:var(--green);">₹${d.fee}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterDoctors() {
+  const f = document.getElementById('specialtyFilter').value;
+  renderDoctors(f ? allDoctors.filter(d => d.specialty === f) : allDoctors);
+}
+
+function selectDoctor(d) {
+  selectedDoctor = d; selectedTime = null;
+  document.getElementById('bookingCard').style.display = 'block';
+  document.getElementById('selectedDoctorInfo').innerHTML = `<strong>${d.name}</strong> — ${d.specialty}<br>Fee: <strong style="color:var(--green)">₹${d.fee}</strong>`;
+  const slots = d.available || [];
+  document.getElementById('timeSlots').innerHTML = slots.map(t =>
+    `<button onclick="selectTime('${t}',this)" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(94,234,212,.2);background:var(--slate-900);color:#fff;cursor:pointer;font-size:13px;transition:all .2s;">${t}</button>`
+  ).join('');
+}
+
+function selectTime(t, el) {
+  selectedTime = t;
+  document.querySelectorAll('#timeSlots button').forEach(b => {
+    b.style.background='var(--slate-900)'; b.style.borderColor='rgba(94,234,212,.2)'; b.style.color='#fff';
+  });
+  el.style.background='rgba(13,148,136,.2)'; el.style.borderColor='var(--teal)'; el.style.color='var(--teal-light)';
+}
+
+async function bookAppointment() {
+  if (!selectedDoctor || !selectedTime || !document.getElementById('aptDate').value) {
+    alert('Please select a doctor, date, and time slot'); return;
+  }
+  openPayModal(selectedDoctor.fee, selectedDoctor.name);
+}
+
+async function loadMyAppointments() {
+  try {
+    const res = await fetch('/api/appointments/list', { headers: {'Authorization':'Bearer '+token} });
+    const data = await res.json();
+    renderMyAppts(data.appointments || []);
+  } catch(e) {
+    renderMyAppts([]);
+  }
+}
+
+function renderMyAppts(apts) {
+  const el = document.getElementById('myApptList');
+  if (!apts || apts.length === 0) {
+    el.innerHTML = '<div style="color:var(--slate-400);font-size:13px;padding:16px;text-align:center;">No appointments yet. Book one on the left!</div>';
+    return;
+  }
+  el.innerHTML = apts.map(a => `
+    <div style="padding:12px;border:1px solid rgba(94,234,212,.08);border-radius:10px;margin-bottom:8px;">
+      <div style="font-size:14px;font-weight:600;">${a.doctor_name || 'Doctor'}</div>
+      <div style="font-size:12px;color:var(--slate-400);">${a.appointment_date||'-'} at ${a.appointment_time||'-'}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <div class="status-badge status-${a.status||'pending'}">● ${a.status||'pending'}</div>
+        <button onclick="cancelAppt('${a.id}')" style="font-size:11px;background:transparent;border:none;color:var(--red);cursor:pointer;">Cancel</button>
+      </div>
+    </div>`).join('');
+}
+
+async function cancelAppt(id) {
+  if (!confirm('Cancel this appointment?')) return;
+  try {
+    const res = await fetch('/api/appointments/cancel/'+id, {method:'POST', headers:{'Authorization':'Bearer '+token}});
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      alert(data.error || 'Could not cancel appointment.');
+      return;
+    }
+    loadMyAppointments();
+  } catch(e) { alert('Could not cancel appointment.'); }
+}
+
+// ---- PRESCRIPTIONS ----
+async function loadPrescriptions() {
+  const el = document.getElementById('prescriptionsList');
+  try {
+    const res = await fetch('/api/prescriptions/list', { headers: {'Authorization':'Bearer '+token} });
+    const data = await res.json();
+    const rxs = data.prescriptions || [];
+    if (rxs.length === 0) {
+      el.innerHTML = '<div style="color:var(--slate-400);text-align:center;padding:40px;">No prescriptions yet. They will appear here after your doctor consultations.</div>';
+    } else {
+      renderRx(rxs);
+    }
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--red);text-align:center;padding:40px;">Could not load prescriptions.</div>';
+  }
+}
+
+function renderRx(rxs) {
+  document.getElementById('prescriptionsList').innerHTML = rxs.map(rx => `
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:18px;font-weight:600;">Rx — ${rx.diagnosis || 'Prescription'}</div>
+          <div style="font-size:13px;color:var(--slate-400);">${rx.doctor_name||'Doctor'} · ${rx.date||rx.created_at||'-'}</div>
+        </div>
+        <button onclick="downloadRx('${rx.id}')" class="btn btn-primary btn-sm">⬇️ PDF</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        ${(rx.medicines||[]).map(m=>`<div style="padding:10px 14px;background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.2);border-radius:10px;font-size:13px;"><strong>${m.name}</strong> ${m.dosage}<br><span style="color:var(--slate-400);font-size:12px;">${m.frequency} · ${m.duration}</span></div>`).join('')}
+      </div>
+      ${rx.notes ? `<div style="font-size:13px;color:var(--slate-400);padding:12px;background:rgba(15,23,42,.5);border-radius:8px;">📋 ${rx.notes}</div>` : ''}
+    </div>`).join('');
+}
+
+async function downloadRx(id) {
+  try {
+    const res = await fetch('/api/prescriptions/generate-pdf', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({id, patient_name: currentUser.full_name || 'Patient', date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})})
+    });
+    if (res.ok) { const blob=await res.blob(); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`prescription_${id}.pdf`; a.click(); }
+  } catch(e) { alert('Could not download prescription.'); }
+}
+
+// ---- PAYMENTS ----
+async function loadPayments() {
+  const el = document.getElementById('paymentList');
+  try {
+    const res = await fetch('/api/payments/history', { headers: {'Authorization':'Bearer '+token} });
+    const data = await res.json();
+    const payments = data.payments || [];
+    const total = data.total_spent || 0;
+    if (payments.length === 0) {
+      el.innerHTML = '<div style="color:var(--slate-400);text-align:center;padding:40px;">No payment history yet.</div>';
+    } else {
+      renderPayments(payments, total);
+    }
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--red);text-align:center;padding:40px;">Could not load payment history.</div>';
+  }
+}
+
+function renderPayments(payments, total) {
+  document.getElementById('paymentList').innerHTML =
+    `<div style="text-align:right;margin-bottom:20px;font-size:14px;color:var(--slate-400);">Total Spent: <strong style="color:var(--green);font-size:20px;font-family:'Clash Display',sans-serif;">₹${total}</strong></div>` +
+    payments.map(p => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;border:1px solid rgba(94,234,212,.08);border-radius:12px;margin-bottom:10px;">
+        <div style="font-size:13px;color:var(--slate-400);">${p.id}</div>
+        <div><div style="font-size:14px;font-weight:600;">${p.doctor||p.description||'Payment'}</div><div style="font-size:12px;color:var(--slate-400);">${p.date||p.created_at||'-'} · ${p.method||'UPI'}</div></div>
+        <div style="text-align:right;"><div style="font-family:'Clash Display',sans-serif;font-size:18px;color:var(--green);">₹${p.amount}</div><div class="status-badge status-confirmed">✅ ${p.status||'Success'}</div></div>
+      </div>`).join('');
+}
+
+// ---- PAYMENT MODAL ----
+let payMethod = 'upi', pendingPayment = null;
+
+function openPayModal(amount, doctor) {
+  pendingPayment = {amount, doctor};
+  document.getElementById('payAmount').textContent = `₹${amount} — ${doctor}`;
+  document.getElementById('paymentModal').style.display = 'flex';
+  selectPayMethod('upi');
+}
+function closePayModal() { document.getElementById('paymentModal').style.display = 'none'; }
+
+function selectPayMethod(m) {
+  payMethod = m;
+  const fields = {
+    upi: '<input placeholder="Enter UPI ID (e.g. name@upi)" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:DM Sans,sans-serif;margin-top:8px;">',
+    card: '<input placeholder="Card Number" style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:DM Sans,sans-serif;margin-top:8px;margin-bottom:8px;"><div style="display:flex;gap:8px;"><input placeholder="MM/YY" style="flex:1;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;"><input placeholder="CVV" style="flex:1;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;"></div>',
+    netbanking: '<select style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;margin-top:8px;"><option>SBI</option><option>HDFC</option><option>ICICI</option><option>Axis Bank</option><option>PNB</option></select>',
+    wallet: '<select style="width:100%;background:var(--slate-900);border:1px solid rgba(94,234,212,.15);border-radius:8px;padding:10px;color:#fff;outline:none;margin-top:8px;"><option>Paytm</option><option>PhonePe</option><option>Google Pay</option><option>Amazon Pay</option></select>'
+  };
+  document.getElementById('payMethodFields').innerHTML = fields[m] || '';
+}
+
+async function processPayment() {
+  const btn = document.getElementById('payNowBtn');
+  btn.innerHTML = '⏳ Processing...'; btn.disabled = true;
+
+  try {
+    let appointmentId = null;
+
+    // 1. Book the appointment first
+    if (pendingPayment && selectedDoctor) {
+      const bookRes = await fetch('/api/appointments/book', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body: JSON.stringify({
+          doctor_name: selectedDoctor.name,
+          specialty: selectedDoctor.specialty,
+          date: document.getElementById('aptDate')?.value || '',
+          time: selectedTime || '',
+          fee: pendingPayment.amount,
+          reason: document.getElementById('aptReason')?.value || ''
+        })
+      });
+      const bookData = await bookRes.json();
+      if (!bookData.success) {
+        showSuccessToast('❌ ' + (bookData.error || 'Booking failed. Please try again.'));
+        closePayModal();
+        btn.innerHTML = 'Pay Now'; btn.disabled = false;
+        return;
+      }
+      appointmentId = bookData.details?.id;
+    }
+
+    // 2. Record the payment
+    await fetch('/api/payments/process', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({
+        amount: pendingPayment?.amount,
+        payment_method: payMethod,
+        appointment_id: appointmentId
+      })
+    });
+
+    await new Promise(r => setTimeout(r, 800));
+    closePayModal();
+    showSuccessToast('✅ Payment successful! Appointment confirmed.');
+    loadMyAppointments();
+    loadDashboard(); // Refresh stats
+  } catch(e) {
+    closePayModal();
+    showSuccessToast('⚠️ Could not process payment. Please try again.');
+  }
+
+  btn.innerHTML = 'Pay Now'; btn.disabled = false;
+}
+
+function showSuccessToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac;padding:14px 20px;border-radius:12px;font-size:14px;z-index:200;animation:slideIn .3s ease;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+function generateReport() { window.location.href = '/health-report'; }
+function logout() { localStorage.clear(); window.location.href = '/'; }
+
+// ================================================================
+// SKIN ANALYSIS — Embedded in Dashboard
+// ================================================================
+let skinStream = null, skinAutoInterval = null, skinIsAuto = false;
+let skinSessionStart = null, skinSessionTimerInterval = null;
+
+async function skinStartCamera() {
+  try {
+    skinStream = await navigator.mediaDevices.getUserMedia({video:{width:1280,height:720,facingMode:'user'}});
+    document.getElementById('skinWebcam').srcObject = skinStream;
+    document.getElementById('skinCameraOff').style.display = 'none';
+    document.getElementById('skinLiveDot').classList.add('active');
+    document.getElementById('skinLiveText').textContent = 'LIVE';
+    document.getElementById('skinStartBtn').disabled = true;
+    document.getElementById('skinAnalyzeBtn').disabled = false;
+    skinSessionStart = Date.now();
+    skinSessionTimerInterval = setInterval(skinUpdateTimer, 1000);
+    skinShowChip('info','✅ Camera active — click Analyze Skin to start');
+  } catch(e) { alert('Camera access denied. Please allow camera permissions.'); }
+}
+
+function skinStop() {
+  if(skinStream) { skinStream.getTracks().forEach(t => t.stop()); skinStream = null; }
+  clearInterval(skinAutoInterval); clearInterval(skinSessionTimerInterval);
+  skinIsAuto = false;
+  const wc = document.getElementById('skinWebcam');
+  if(wc) wc.srcObject = null;
+  const ov = document.getElementById('skinOverlay');
+  if(ov) ov.style.display = 'none';
+  const co = document.getElementById('skinCameraOff');
+  if(co) co.style.display = 'flex';
+  const ld = document.getElementById('skinLiveDot');
+  if(ld) ld.classList.remove('active');
+  const lt = document.getElementById('skinLiveText');
+  if(lt) lt.textContent = 'Camera Off';
+  const sb = document.getElementById('skinStartBtn');
+  if(sb) sb.disabled = false;
+  const ab = document.getElementById('skinAnalyzeBtn');
+  if(ab) ab.disabled = true;
+  const autoB = document.getElementById('skinAutoBtn');
+  if(autoB) autoB.innerHTML = '▶️ Auto Scan';
+}
+
+function skinToggleAuto() {
+  if(!skinStream) return;
+  skinIsAuto = !skinIsAuto;
+  document.getElementById('skinAutoBtn').innerHTML = skinIsAuto ? '⏸️ Pause Auto' : '▶️ Auto Scan';
+  if(skinIsAuto) { skinAnalyze(); skinAutoInterval = setInterval(skinAnalyze, 5000); }
+  else clearInterval(skinAutoInterval);
+}
+
+function skinUpdateTimer() {
+  if(!skinSessionStart) return;
+  const e = Math.floor((Date.now()-skinSessionStart)/1000);
+  const el = document.getElementById('skinSessionTimer');
+  if(el) el.textContent = `Session: ${Math.floor(e/60)}:${(e%60).toString().padStart(2,'0')}`;
+}
+
+function skinCaptureFrame() {
+  const v = document.getElementById('skinWebcam');
+  const c = document.createElement('canvas');
+  const scale = v.videoWidth > 640 ? 640/v.videoWidth : 1;
+  c.width = (v.videoWidth||640)*scale; c.height = (v.videoHeight||480)*scale;
+  c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.75);
+}
+
+async function skinAnalyze() {
+  if(!skinStream) return;
+  const btn = document.getElementById('skinAnalyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="sspin"></div> Analyzing...';
+  try {
+    const res = await fetch('/api/vision/skin/analyze',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({image: skinCaptureFrame()})
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Server error');
+    if(data.processed_image){
+      const ov = document.getElementById('skinOverlay');
+      ov.src = data.processed_image; ov.style.display = 'block';
+    }
+    if(data.skin_analysis) {
+      renderSkinResults(data.skin_analysis);
+      skinShowChip('success','✅ Skin analysis complete!');
+    } else {
+      skinShowChip('info','ℹ️ ' + (data.message||'No face detected. Please re-position.'));
+    }
+  } catch(e) { skinShowChip('danger','❌ Error: '+e.message); }
+  btn.disabled = false;
+  btn.innerHTML = '🔬 Analyze Skin';
+}
+
+function skinBarColor(val, invert=false) {
+  const v = invert ? 100-val : val;
+  if(v >= 70) return '#22c55e';
+  if(v >= 40) return '#f59e0b';
+  return '#ef4444';
+}
+
+function skinMetricBar(label, value, invertColor=false) {
+  const v = Math.round(value || 0);
+  const color = invertColor
+    ? (v<=30?'#22c55e':v<=60?'#f59e0b':'#ef4444')
+    : (v>=70?'#22c55e':v>=45?'#f59e0b':'#ef4444');
+  return `
+    <div class="skin-metric-row">
+      <div class="skin-metric-name">${label}</div>
+      <div class="skin-metric-bar-wrap"><div class="skin-metric-bar-fill" style="width:${v}%;background:${color}"></div></div>
+      <div class="skin-metric-val" style="color:${color}">${v}</div>
+    </div>`;
+}
+
+function renderSkinResults(a) {
+  const score = a.overall_score || 70;
+  const circ = 2 * Math.PI * 50;
+  const offset = circ - (score/100)*circ;
+  const sc = score>=70?'#22c55e':score>=45?'#f59e0b':'#ef4444';
+  const sl = score>=70?'Good Skin Health':score>=45?'Moderate Health':'Needs Attention';
+  const slCls = score>=70?'sst-good':score>=45?'sst-mod':'sst-poor';
+
+  let condHtml = '';
+  if(a.conditions && a.conditions.length) {
+    condHtml = a.conditions.map(c => `
+      <div class="skin-cond-item scond-${c.severity}">
+        <div><div style="font-size:12px;font-weight:500">${c.name}</div><div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.5px">${c.severity}</div></div>
+        <div style="font-size:11px;font-weight:600">${c.value||''}</div>
+      </div>`).join('');
+  } else {
+    condHtml = '<div class="skin-all-clear">✅ No major skin conditions detected. Keep it up!</div>';
+  }
+
+  const sugHtml = (a.suggestions||[]).map(s =>
+    `<div class="skin-sug-item"><span style="color:var(--teal-light);flex-shrink:0">→</span>${s}</div>`).join('');
+
+  document.getElementById('skinPanelBody').innerHTML = `
+    <div class="skin-score-wrap">
+      <div class="skin-score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(94,234,212,.1)" stroke-width="8"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="${sc}" stroke-width="8"
+            stroke-linecap="round"
+            stroke-dasharray="${circ.toFixed(1)}"
+            stroke-dashoffset="${offset.toFixed(1)}"/>
+        </svg>
+        <div class="skin-score-inner">
+          <span class="skin-score-num" style="color:${sc}">${score}</span>
+          <span class="skin-score-lbl">/ 100</span>
+        </div>
+      </div>
+      <div class="skin-score-tag ${slCls}">${sl}</div>
+    </div>
+
+    <div class="skin-meta-grid">
+      <div class="skin-meta-card"><div class="smc-lbl">Skin Tone</div><div class="smc-val">${a.skin_tone||'—'}</div></div>
+      <div class="skin-meta-card"><div class="smc-lbl">Hydration</div><div class="smc-val" style="color:${a.hydration==='Balanced'?'#22c55e':a.hydration==='Dry'?'#f59e0b':'#94a3b8'}">${a.hydration||'—'}</div></div>
+      <div class="skin-meta-card"><div class="smc-lbl">Texture</div><div class="smc-val">${a.texture||'—'}</div></div>
+      <div class="skin-meta-card"><div class="smc-lbl">Scanned At</div><div class="smc-val" style="font-size:11px">${new Date().toLocaleTimeString('en-IN')}</div></div>
+    </div>
+
+    <div class="skin-metric-section">
+      <div class="skin-section-hd">Skin Metrics</div>
+      ${skinMetricBar('Smoothness', a.smoothness, false)}
+      ${skinMetricBar('Redness', a.redness_pct, true)}
+      ${skinMetricBar('Oiliness', a.oiliness_pct, true)}
+      ${skinMetricBar('Dark Circles', a.dark_circles, true)}
+      ${skinMetricBar('Pore Visibility', a.pore_visibility, true)}
+      ${skinMetricBar('Pigmentation', a.pigmentation, true)}
+      ${skinMetricBar('Fine Lines', a.wrinkle_score, true)}
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div class="skin-section-hd">Detected Conditions</div>
+      ${condHtml}
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div class="skin-section-hd">Skincare Recommendations</div>
+      ${sugHtml}
+    </div>
+
+    <div style="font-size:10px;color:var(--slate-600);text-align:center;padding-top:6px;">
+      ⚠️ For informational purposes only. Consult a dermatologist for medical advice.
+    </div>
+  `;
+}
+
+function skinShowChip(type, msg) {
+  const ov = document.getElementById('skinAlertOverlay');
+  if(!ov) return;
+  const c = document.createElement('div');
+  c.className = `skin-chip ${type}`;
+  c.innerHTML = `${msg}<span class="scx" onclick="this.parentElement.remove()">✕</span>`;
+  ov.appendChild(c);
+  setTimeout(()=>c.remove&&c.remove(), 5000);
+}
+</script>
+</body>
+</html>

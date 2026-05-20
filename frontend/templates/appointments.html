@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Appointments — MediVision AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0d9488;--teal-dark:#0f766e;--teal-light:#5eead4;--cyan:#06b6d4;--slate-900:#0f172a;--slate-800:#1e293b;--slate-700:#334155;--slate-600:#475569;--slate-400:#94a3b8;--white:#fff;--red:#ef4444;--amber:#f59e0b;--green:#22c55e;--sidebar-w:260px;}
+*{margin:0;padding:0;box-sizing:border-box;}html,body{height:100%;overflow:hidden;}
+body{background:var(--slate-900);color:#fff;font-family:'DM Sans',sans-serif;display:flex;}
+.sidebar{width:var(--sidebar-w);background:var(--slate-800);border-right:1px solid rgba(94,234,212,.1);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:50;}
+.sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(94,234,212,.1);display:flex;align-items:center;gap:10px;}
+.brand-icon{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.brand-text{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;}
+.brand-text span{color:var(--teal-light);}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto;}
+.nav-group-label{font-size:11px;font-weight:600;color:var(--slate-600);text-transform:uppercase;letter-spacing:1.5px;padding:8px 10px 6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--slate-400);text-decoration:none;font-size:14px;transition:all .2s;margin-bottom:2px;}
+.nav-item:hover,.nav-item.active{background:rgba(13,148,136,.15);color:#fff;}
+.nav-item.active{color:var(--teal-light);}
+.nav-icon{width:18px;text-align:center;font-size:16px;}
+.main{margin-left:var(--sidebar-w);flex:1;height:100vh;overflow-y:auto;padding:32px;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.page-title{font-family:'Clash Display',sans-serif;font-size:28px;font-weight:700;}
+.page-sub{color:var(--slate-400);font-size:14px;margin-top:4px;}
+.btn{padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.btn-primary{background:var(--teal);color:#fff;}
+.btn-primary:hover{background:var(--teal-dark);}
+.btn-sm{padding:6px 14px;font-size:13px;border-radius:6px;}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:rgba(30,41,59,.6);border:1px solid rgba(94,234,212,.1);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;}
+.tab{padding:8px 20px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:500;color:var(--slate-400);transition:all .2s;}
+.tab.active{background:var(--teal);color:#fff;}
+
+/* Cards */
+.card{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:16px;padding:24px;}
+.card-title{font-family:'Clash Display',sans-serif;font-size:16px;font-weight:600;margin-bottom:16px;}
+
+/* Doctor grid */
+.doctor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+.doctor-card{background:var(--slate-800);border:1px solid rgba(94,234,212,.1);border-radius:16px;padding:22px;transition:all .3s;cursor:pointer;}
+.doctor-card:hover{border-color:rgba(13,148,136,.4);transform:translateY(-2px);}
+.doctor-card.selected{border-color:var(--teal);background:rgba(13,148,136,.08);}
+.doctor-avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--teal),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;}
+.doctor-name{font-family:'Clash Display',sans-serif;font-size:17px;font-weight:600;margin-bottom:2px;}
+.doctor-spec{font-size:13px;color:var(--teal-light);margin-bottom:8px;}
+.doctor-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--slate-400);margin-bottom:14px;}
+.doctor-meta span{display:flex;align-items:center;gap:4px;}
+.stars{color:var(--amber);}
+.doctor-fee{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:700;color:var(--white);}
+.doctor-fee span{font-size:12px;color:var(--slate-400);font-family:'DM Sans',sans-serif;}
+
+/* Time slots */
+.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:12px;}
+.slot{padding:8px;border-radius:8px;background:rgba(15,23,42,.6);border:1px solid rgba(94,234,212,.1);text-align:center;cursor:pointer;font-size:13px;transition:all .2s;}
+.slot:hover,.slot.selected{background:rgba(13,148,136,.2);border-color:var(--teal);color:var(--teal-light);}
+.slot.booked{opacity:.4;cursor:not-allowed;text-decoration:line-through;}
+
+/* Appointment list */
+.appt-item{display:flex;align-items:center;gap:16px;padding:16px;background:rgba(15,23,42,.4);border:1px solid rgba(94,234,212,.08);border-radius:12px;margin-bottom:12px;transition:all .2s;}
+.appt-item:hover{border-color:rgba(94,234,212,.2);}
+.appt-avatar{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.appt-info{flex:1;}
+.appt-name{font-weight:600;margin-bottom:2px;}
+.appt-detail{font-size:13px;color:var(--slate-400);}
+.status-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.status-confirmed{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);}
+.status-pending{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+.status-cancelled{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+.status-completed{background:rgba(94,234,212,.15);color:var(--teal-light);border:1px solid rgba(94,234,212,.3);}
+
+/* Filter */
+.filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.filter-input{background:rgba(15,23,42,.6);border:1px solid rgba(94,234,212,.1);border-radius:8px;padding:9px 14px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.filter-input:focus{border-color:var(--teal);}
+
+/* Payment modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--slate-800);border:1px solid rgba(94,234,212,.2);border-radius:20px;padding:32px;width:480px;max-width:95vw;position:relative;}
+.modal-title{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;}
+.modal-sub{color:var(--slate-400);font-size:14px;margin-bottom:24px;}
+.modal-close{position:absolute;top:20px;right:20px;background:none;border:none;color:var(--slate-400);font-size:20px;cursor:pointer;transition:color .2s;}
+.modal-close:hover{color:#fff;}
+.payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.payment-method{padding:14px;border-radius:12px;border:2px solid rgba(94,234,212,.1);cursor:pointer;text-align:center;transition:all .2s;}
+.payment-method:hover,.payment-method.selected{border-color:var(--teal);background:rgba(13,148,136,.1);}
+.payment-method .pm-icon{font-size:24px;margin-bottom:4px;}
+.payment-method .pm-name{font-size:13px;font-weight:500;}
+.booking-summary{background:rgba(15,23,42,.6);border-radius:12px;padding:16px;margin-bottom:20px;}
+.summary-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;color:var(--slate-300);}
+.summary-row.total{color:#fff;font-weight:600;font-size:16px;border-top:1px solid rgba(94,234,212,.1);padding-top:10px;margin-top:5px;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-animation{text-align:center;padding:20px 0;}
+.success-icon{font-size:64px;animation:pop .4s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+</style>
+<script src="/static/theme.js"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🏥</div>
+    <div class="brand-text">MediVision<span>AI</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Main</div>
+    <a class="nav-item" href="/dashboard"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item" href="/ai-predict"><span class="nav-icon">🧠</span>AI Predict</a>
+    <a class="nav-item" href="/medibot"><span class="nav-icon">🤖</span>MediBot</a>
+    <a class="nav-item" href="/vision"><span class="nav-icon">👁️</span>Vision AI</a>
+    <div class="nav-group-label" style="margin-top:12px;">Healthcare</div>
+    <a class="nav-item active" href="/appointments"><span class="nav-icon">📅</span>Appointments</a>
+    <a class="nav-item" href="/prescriptions"><span class="nav-icon">💊</span>Prescriptions</a>
+    <a class="nav-item" href="/health-report"><span class="nav-icon">📋</span>Health Report</a>
+  </nav>
+</div>
+
+<div class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">📅 Appointments</div>
+      <div class="page-sub">Book, manage, and track your medical appointments</div>
+    </div>
+    <button class="btn btn-primary" onclick="showTab('book')">+ Book Appointment</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('my')">My Appointments</div>
+    <div class="tab" onclick="showTab('book')">Book New</div>
+  </div>
+
+  <!-- MY APPOINTMENTS -->
+  <div id="tab-my">
+    <div class="filter-bar">
+      <input class="filter-input" placeholder="🔍 Search doctor or specialty..." id="apptSearch" oninput="filterAppts()">
+      <select class="filter-input" id="apptStatus" onchange="filterAppts()" style="cursor:pointer">
+        <option value="">All Status</option>
+        <option>confirmed</option><option>pending</option><option>completed</option><option>cancelled</option>
+      </select>
+    </div>
+    <div id="apptList"></div>
+  </div>
+
+  <!-- BOOK APPOINTMENT -->
+  <div id="tab-book" style="display:none">
+    <!-- Step 1: Choose specialty -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:600;color:var(--slate-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Filter by Specialty</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px" id="specFilters">
+        <button class="btn btn-sm" style="background:var(--teal);color:#fff" onclick="filterDoctors('')">All</button>
+        <button class="btn btn-sm" style="background:rgba(30,41,59,.8);color:var(--slate-300);border:1px solid rgba(94,234,212,.1)" onclick="filterDoctors('Cardiologist')">❤️ Cardiology</button>
+        <button class="btn btn-sm" style="background:rgba(30,41,59,.8);color:var(--slate-300);border:1px solid rgba(94,234,212,.1)" onclick="filterDoctors('Neurologist')">🧠 Neurology</button>
+        <button class="btn btn-sm" style="background:rgba(30,41,59,.8);color:var(--slate-300);border:1px solid rgba(94,234,212,.1)" onclick="filterDoctors('Dermatologist')">🔬 Dermatology</button>
+        <button class="btn btn-sm" style="background:rgba(30,41,59,.8);color:var(--slate-300);border:1px solid rgba(94,234,212,.1)" onclick="filterDoctors('General Physician')">👨‍⚕️ General</button>
+        <button class="btn btn-sm" style="background:rgba(30,41,59,.8);color:var(--slate-300);border:1px solid rgba(94,234,212,.1)" onclick="filterDoctors('Orthopedic')">🦴 Orthopedic</button>
+      </div>
+    </div>
+    <div class="doctor-grid" id="doctorGrid"></div>
+
+    <!-- Booking panel -->
+    <div id="bookingPanel" style="display:none;margin-top:24px">
+      <div class="card">
+        <div class="card-title">📋 Complete Your Booking</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:12px;color:var(--slate-400);margin-bottom:6px">Date</div>
+            <input type="date" class="filter-input" id="bookDate" style="width:100%" min="">
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--slate-400);margin-bottom:6px">Time Slot</div>
+            <div class="slots-grid" id="timeSlots"></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--slate-400);margin-bottom:6px">Reason</div>
+            <textarea class="filter-input" id="bookReason" placeholder="Describe your symptoms..." style="width:100%;height:80px;resize:none"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;width:200px" onclick="openPayment()">Proceed to Payment →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const token = localStorage.getItem('medivision_token');
+if (!token) { window.location.href = '/login'; }
+
+let doctors = [];
+let selectedDoctor = null;
+let selectedSlot = null;
+let selectedPaymentMethod = null;
+let appointments = [];
+
+async function loadDoctors() {
+  try {
+    const res = await fetch('/api/appointments/doctors');
+    const data = await res.json();
+    doctors = data.doctors || [];
+  } catch(e) {
+    doctors = [];
+    console.error("Failed to load doctors", e);
+  }
+  renderDoctors(doctors);
+}
+
+async function loadAppointments() {
+  try {
+    const res = await fetch('/api/appointments/list', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    appointments = data.appointments || [];
+  } catch(e) {
+    appointments = [];
+    console.error("Failed to load appointments", e);
+  }
+  renderAppointments(appointments);
+}
+
+function renderDoctors(docs) {
+  const emojis = {'Cardiologist':'❤️','Neurologist':'🧠','Dermatologist':'🔬','General Physician':'👨‍⚕️','Gynecologist':'👩‍⚕️','Orthopedic':'🦴'};
+  document.getElementById('doctorGrid').innerHTML = docs.map(d => `
+    <div class="doctor-card" id="dc-${d.id}" onclick="selectDoctor('${d.id}')">
+      <div class="doctor-avatar">${emojis[d.specialty]||'👨‍⚕️'}</div>
+      <div class="doctor-name">${d.name}</div>
+      <div class="doctor-spec">${d.specialty}</div>
+      <div class="doctor-meta">
+        <span><span class="stars">★</span> ${d.rating}</span>
+        <span>🕐 ${d.experience}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="doctor-fee">₹${d.fee}<span>/consultation</span></div>
+        <span style="font-size:12px;color:var(--green)">● Available</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectDoctor(id) {
+  selectedDoctor = doctors.find(d => d.id === id);
+  document.querySelectorAll('.doctor-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`dc-${id}`).classList.add('selected');
+
+  // Show booking panel
+  document.getElementById('bookingPanel').style.display = 'block';
+  document.getElementById('bookingPanel').scrollIntoView({ behavior: 'smooth' });
+
+  // Set min date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const input = document.getElementById('bookDate');
+  input.min = tomorrow.toISOString().split('T')[0];
+  input.value = tomorrow.toISOString().split('T')[0];
+
+  // Render slots
+  renderSlots(selectedDoctor.available);
+}
+
+function renderSlots(slots) {
+  const booked = ['10:00']; // Simulate some booked slots
+  document.getElementById('timeSlots').innerHTML = slots.map(s => `
+    <div class="slot ${booked.includes(s)?'booked':''}" onclick="${booked.includes(s)?'':'selectSlot(this,\''+s+'\')'}">${s}</div>
+  `).join('');
+}
+
+function selectSlot(el, slot) {
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = slot;
+}
+
+function filterDoctors(spec) {
+  const filtered = spec ? doctors.filter(d => d.specialty.includes(spec)) : doctors;
+  renderDoctors(filtered);
+  document.getElementById('bookingPanel').style.display = 'none';
+  selectedDoctor = null;
+}
+
+function renderAppointments(appts) {
+  if(!appts.length) {
+    document.getElementById('apptList').innerHTML = '<div style="text-align:center;padding:60px;color:var(--slate-600)"><div style="font-size:48px;margin-bottom:12px">📅</div>No appointments found</div>';
+    return;
+  }
+  document.getElementById('apptList').innerHTML = appts.map(a => `
+    <div class="appt-item">
+      <div class="appt-avatar">${a.specialty==='Cardiologist'?'❤️':a.specialty==='Neurologist'?'🧠':a.specialty==='Dermatologist'?'🔬':'👨‍⚕️'}</div>
+      <div class="appt-info">
+        <div class="appt-name">${a.doctor_name}</div>
+        <div class="appt-detail">${a.specialty} · ${a.date} at ${a.time}</div>
+      </div>
+      <div style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:600;margin-right:16px">₹${a.fee}</div>
+      <span class="status-badge status-${a.status}">${a.status}</span>
+      ${a.status==='pending'||a.status==='confirmed'?`<button class="btn btn-sm" style="background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2);margin-left:8px" onclick="cancelAppt('${a.id}')">Cancel</button>`:''}
+    </div>
+  `).join('');
+}
+
+function filterAppts() {
+  const search = document.getElementById('apptSearch').value.toLowerCase();
+  const status = document.getElementById('apptStatus').value;
+  const filtered = appointments.filter(a =>
+    (!search || a.doctor_name.toLowerCase().includes(search) || a.specialty.toLowerCase().includes(search)) &&
+    (!status || a.status === status)
+  );
+  renderAppointments(filtered);
+}
+
+async function cancelAppt(id) {
+  if(!confirm('Cancel this appointment?')) return;
+  try {
+    const res = await fetch('/api/appointments/cancel/' + id, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      appointments = appointments.map(a => a.id === id ? {...a, status: 'cancelled'} : a);
+      renderAppointments(appointments);
+    } else {
+      alert(data.error || 'Could not cancel appointment.');
+    }
+  } catch(e) {
+    alert('Connection error. Could not cancel appointment.');
+  }
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='my')||(i===1&&tab==='book')));
+  document.getElementById('tab-my').style.display = tab==='my' ? 'block' : 'none';
+  document.getElementById('tab-book').style.display = tab==='book' ? 'block' : 'none';
+}
+
+function openPayment() {
+  if(!selectedDoctor) { alert('Please select a doctor first'); return; }
+  if(!selectedSlot) { alert('Please select a time slot'); return; }
+  const date = document.getElementById('bookDate').value;
+  if(!date) { alert('Please select a date'); return; }
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-title">💳 Payment</div>
+    <div class="modal-sub">Complete your appointment booking</div>
+    <div class="booking-summary">
+      <div class="summary-row"><span>Doctor</span><span>${selectedDoctor.name}</span></div>
+      <div class="summary-row"><span>Specialty</span><span>${selectedDoctor.specialty}</span></div>
+      <div class="summary-row"><span>Date & Time</span><span>${date} at ${selectedSlot}</span></div>
+      <div class="summary-row"><span>Consultation Fee</span><span>₹${selectedDoctor.fee}</span></div>
+      <div class="summary-row"><span>Platform Fee</span><span>₹50</span></div>
+      <div class="summary-row total"><span>Total</span><span>₹${selectedDoctor.fee + 50}</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--slate-400);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px">Payment Method</div>
+    <div class="payment-methods">
+      <div class="payment-method" onclick="selectPM(this,'upi')"><div class="pm-icon">📱</div><div class="pm-name">UPI</div></div>
+      <div class="payment-method" onclick="selectPM(this,'card')"><div class="pm-icon">💳</div><div class="pm-name">Credit/Debit</div></div>
+      <div class="payment-method" onclick="selectPM(this,'netbanking')"><div class="pm-icon">🏦</div><div class="pm-name">Net Banking</div></div>
+      <div class="payment-method" onclick="selectPM(this,'wallet')"><div class="pm-icon">👛</div><div class="pm-name">Wallet</div></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="processPayment()">Pay ₹${selectedDoctor.fee + 50}</button>
+  `;
+  document.getElementById('paymentModal').classList.add('show');
+}
+
+function selectPM(el, method) {
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPaymentMethod = method;
+}
+
+async function processPayment() {
+  const btn = document.querySelector('#modalContent .btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Processing...';
+
+  const date = document.getElementById('bookDate').value;
+  try {
+    // Step 1: Book appointment
+    const bookRes = await fetch('/api/appointments/book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        doctor_name: selectedDoctor.name,
+        specialty: selectedDoctor.specialty,
+        date: date,
+        time: selectedSlot,
+        fee: selectedDoctor.fee,
+        reason: ''
+      })
+    });
+    const bookData = await bookRes.json();
+    if (!bookData.success) {
+      alert(bookData.error || 'Booking failed. Please try again.');
+      btn.disabled = false; btn.innerHTML = `Pay ₹${selectedDoctor.fee + 50}`;
+      return;
+    }
+
+    // Step 2: Process payment
+    await fetch('/api/payments/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        appointment_id: bookData.details?.id,
+        amount: selectedDoctor.fee + 50,
+        payment_method: selectedPaymentMethod || 'upi'
+      })
+    });
+
+    const aptId = bookData.appointment_id || 'APT-' + Math.random().toString(36).substr(2,8).toUpperCase();
+    document.getElementById('modalContent').innerHTML = `
+      <div class="success-animation">
+        <div class="success-icon">✅</div>
+        <div style="font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;margin:16px 0 8px">Booking Confirmed!</div>
+        <div style="color:var(--slate-400);font-size:14px;margin-bottom:20px">Your appointment with ${selectedDoctor.name} is confirmed.</div>
+        <div style="background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.2);border-radius:10px;padding:16px;margin-bottom:20px">
+          <div style="font-size:13px;color:var(--teal-light)">Appointment ID: ${aptId}</div>
+          <div style="font-size:13px;color:var(--slate-300);margin-top:4px">Confirmation saved to your account</div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="closeModal();showTab('my');loadAppointments()">View My Appointments</button>
+      </div>
+    `;
+  } catch(e) {
+    alert('Connection error. Please try again.');
+    btn.disabled = false; btn.innerHTML = `Pay ₹${selectedDoctor.fee + 50}`;
+  }
+}
+
+function closeModal() { document.getElementById('paymentModal').classList.remove('show'); }
+
+window.onload = () => { loadDoctors(); loadAppointments(); };
+</script>
+</body>
+</html>

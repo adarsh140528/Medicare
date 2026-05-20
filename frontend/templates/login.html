@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — MediVision AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:#0d9488; --teal-dark:#0f766e; --teal-light:#5eead4; --cyan:#06b6d4;
+  --slate-900:#0f172a; --slate-800:#1e293b; --slate-700:#334155;
+  --slate-600:#475569; --slate-400:#94a3b8; --red:#ef4444;
+  --amber:#f59e0b; --green:#22c55e;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--slate-900); color:#fff; font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; }
+
+/* Background */
+.bg-glow { position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 60% 80% at 30% 50%,rgba(13,148,136,.18) 0%,transparent 70%); }
+.grid { position:fixed; inset:0; pointer-events:none; opacity:.04; background-image:linear-gradient(var(--teal) 1px,transparent 1px),linear-gradient(90deg,var(--teal) 1px,transparent 1px); background-size:50px 50px; }
+
+/* ── LEFT PANEL ── */
+.left { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 40px; position:relative; z-index:1; }
+.brand { position:absolute; top:32px; left:40px; display:flex; align-items:center; gap:10px; font-family:'Clash Display',sans-serif; font-size:20px; font-weight:700; text-decoration:none; color:#fff; }
+.brand-icon { width:32px; height:32px; background:var(--teal); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+
+.login-box { width:100%; max-width:420px; }
+.login-title { font-family:'Clash Display',sans-serif; font-size:36px; font-weight:700; margin-bottom:6px; }
+.login-sub { color:var(--slate-400); font-size:15px; margin-bottom:36px; }
+
+/* Panels */
+.panel { display:none; }
+.panel.show { display:block; }
+
+/* Form */
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:13px; font-weight:500; color:var(--slate-400); margin-bottom:8px; }
+.field input {
+  width:100%; background:var(--slate-800); border:1.5px solid rgba(94,234,212,.15);
+  border-radius:11px; padding:13px 16px; color:#fff; font-size:15px;
+  font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s;
+}
+.field input:focus { border-color:var(--teal); }
+.field input::placeholder { color:var(--slate-600); }
+
+/* Buttons */
+.btn {
+  width:100%; padding:14px; border:none; border-radius:11px; font-size:15px;
+  font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all .2s; margin-bottom:10px;
+}
+.btn-primary { background:var(--teal); color:#fff; }
+.btn-primary:hover { background:var(--teal-dark); transform:translateY(-1px); box-shadow:0 8px 24px rgba(13,148,136,.4); }
+.btn-primary:disabled { opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* Alert */
+.alert { padding:12px 16px; border-radius:10px; font-size:13px; margin-bottom:18px; display:none; align-items:center; gap:10px; line-height:1.5; }
+
+/* Role Toggle */
+.role-toggle { display:flex; gap:6px; margin-bottom:28px; padding:5px; background:rgba(15,23,42,.8); border-radius:14px; border:1px solid rgba(94,234,212,.12); }
+.role-btn {
+  flex:1; padding:13px 10px; text-align:center; cursor:pointer;
+  font-size:13px; font-weight:600; border-radius:10px;
+  transition:all .25s; font-family:'DM Sans',sans-serif;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  letter-spacing:.2px;
+}
+.role-btn.active {
+  background:linear-gradient(135deg,var(--teal),var(--cyan));
+  color:#fff; box-shadow:0 4px 16px rgba(13,148,136,.35);
+}
+.role-btn:not(.active) { color:var(--slate-500); }
+.role-btn:not(.active):hover { color:#fff; background:rgba(255,255,255,.06); }
+.role-badge { font-size:16px; line-height:1; }
+
+/* Doctor mode indicator */
+.doctor-mode-bar {
+  display:none; align-items:center; gap:10px;
+  background:linear-gradient(90deg,rgba(139,92,246,.12),rgba(6,182,212,.08));
+  border:1px solid rgba(139,92,246,.25); border-radius:10px;
+  padding:10px 14px; margin-bottom:20px; font-size:13px;
+}
+.doctor-mode-bar.show { display:flex; }
+.dmb-dot { width:8px; height:8px; border-radius:50%; background:#a78bfa; animation:dmPulse 1.5s infinite; flex-shrink:0; }
+@keyframes dmPulse { 0%,100%{opacity:1}50%{opacity:.4} }
+.dmb-text { color:#c4b5fd; font-weight:500; }
+.dmb-text strong { color:#ddd8fe; }
+.alert.show { display:flex; }
+.alert-error { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); color:#fca5a5; }
+.alert-success { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3); color:#86efac; }
+.alert-info { background:rgba(13,148,136,.1); border:1px solid rgba(13,148,136,.3); color:var(--teal-light); }
+
+/* OTP inputs */
+.otp-row { display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
+.otp-digit {
+  width:52px; height:60px; text-align:center; font-size:24px; font-weight:700;
+  background:var(--slate-800); border:2px solid rgba(94,234,212,.15);
+  border-radius:12px; color:#fff; font-family:'Clash Display',sans-serif;
+  outline:none; transition:border-color .2s;
+}
+.otp-digit:focus { border-color:var(--teal); }
+.otp-digit.filled { border-color:rgba(13,148,136,.6); background:rgba(13,148,136,.08); }
+.otp-digit.error { border-color:var(--red); animation:shake .3s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+.otp-hint { text-align:center; font-size:13px; color:var(--slate-400); margin-bottom:24px; line-height:1.6; }
+.otp-timer { text-align:center; font-size:13px; color:var(--slate-400); margin-bottom:16px; }
+.otp-timer b { color:var(--teal-light); }
+.resend-btn { background:none; border:none; color:var(--teal-light); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; text-decoration:underline; }
+.resend-btn:disabled { color:var(--slate-600); cursor:not-allowed; text-decoration:none; }
+
+/* Dev OTP notice */
+.dev-otp-box { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.25); border-radius:10px; padding:12px 16px; margin-bottom:18px; font-size:13px; color:#fcd34d; display:none; }
+.dev-otp-box.show { display:block; }
+.dev-otp-box strong { font-size:20px; color:#fff; font-family:'Clash Display',sans-serif; }
+
+/* Footer */
+.login-footer { margin-top:28px; text-align:center; font-size:14px; color:var(--slate-400); }
+.login-footer a { color:var(--teal-light); text-decoration:none; font-weight:500; }
+
+/* Spinner */
+.spin { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; flex-shrink:0; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── RIGHT PANEL ── */
+.right {
+  width:400px; background:linear-gradient(160deg,rgba(13,148,136,.12),rgba(6,182,212,.05));
+  border-left:1px solid rgba(94,234,212,.1);
+  display:flex; flex-direction:column; justify-content:center; padding:60px 44px;
+  position:relative; z-index:1;
+}
+.right h2 { font-family:'Clash Display',sans-serif; font-size:26px; margin-bottom:12px; }
+.right p { color:var(--slate-400); font-size:14px; line-height:1.7; margin-bottom:36px; }
+.feat-item { display:flex; align-items:flex-start; gap:14px; padding:14px; border-radius:12px; margin-bottom:10px; background:rgba(15,23,42,.5); border:1px solid rgba(94,234,212,.08); }
+.feat-emoji { font-size:22px; flex-shrink:0; margin-top:1px; }
+.feat-item h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
+.feat-item p { font-size:12px; color:var(--slate-400); line-height:1.5; }
+.demo-box { margin-top:24px; background:rgba(13,148,136,.08); border:1px solid rgba(13,148,136,.25); border-radius:12px; padding:18px; }
+.demo-box .demo-label { font-size:11px; font-weight:600; color:var(--teal-light); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+.demo-cred { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
+.demo-cred span:first-child { color:var(--slate-400); }
+.demo-cred code { background:rgba(0,0,0,.3); padding:2px 8px; border-radius:5px; font-family:'DM Mono',monospace; font-size:13px; color:#fff; }
+
+@media(max-width:860px) { .right { display:none; } }
+</style>
+<script src="/static/theme.js"></script>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="grid"></div>
+
+<!-- LEFT -->
+<div class="left">
+  <a href="/" class="brand">
+    <div class="brand-icon">🏥</div>
+    MediVision<span style="color:var(--teal-light)">AI</span>
+  </a>
+
+  <div class="login-box">
+    <div class="login-title" id="loginTitle">Welcome back</div>
+    <div class="login-sub" id="loginSub">Sign in to your health dashboard</div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <!-- ── STEP 1: Password ── -->
+    <div id="panelPassword" class="panel show">
+
+      <div class="role-toggle">
+        <div id="btnPatient" class="role-btn active" onclick="setRole('patient')">
+          <span class="role-badge">🧑‍⚕️</span> Patient Login
+        </div>
+        <div id="btnDoctor" class="role-btn" onclick="setRole('doctor')">
+          <span class="role-badge">⚕️</span> Doctor Login
+        </div>
+      </div>
+
+      <div class="doctor-mode-bar" id="doctorModeBar">
+        <div class="dmb-dot"></div>
+        <div class="dmb-text">Signing in as <strong>Medical Professional</strong> — credentials managed by admin</div>
+      </div>
+
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="inEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="inPassword" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter') doLogin()">
+      </div>
+      <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">🔑 Login</button>
+      <div class="login-footer">
+        Don't have an account? <a href="/register">Create one →</a>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: OTP ── -->
+    <div id="panelOtp" class="panel">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:48px;margin-bottom:10px">📱</div>
+        <div style="font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;">Verify OTP</div>
+        <div class="otp-hint" id="otpHint">Enter the 6-digit OTP sent to your registered phone number.</div>
+      </div>
+
+
+
+      <div class="otp-row" id="otpRow">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      </div>
+
+      <div class="otp-timer">OTP expires in <b id="timerDisplay">10:00</b></div>
+      <button class="btn btn-primary" id="verifyBtn" onclick="doVerifyOtp()">✅ Verify OTP</button>
+      <div style="text-align:center;font-size:13px;color:var(--slate-400);">
+        Didn't receive?
+        <button class="resend-btn" id="resendBtn" onclick="doResend()">Resend OTP</button>
+      </div>
+      <div style="text-align:center;margin-top:16px;">
+        <button onclick="goBack()" style="background:none;border:none;color:var(--slate-400);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;">← Back to login</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+  <h2>Secure Healthcare Login</h2>
+  <p>Your health data is protected with industry-standard encryption and two-factor authentication via OTP.</p>
+  <div class="feat-item">
+    <div class="feat-emoji">🔒</div>
+    <div>
+      <h4>Password + OTP 2FA</h4>
+      <p>Verify your identity with a one-time password sent to your registered phone via Twilio SMS.</p>
+    </div>
+  </div>
+  <div class="feat-item">
+    <div class="feat-emoji">🛡️</div>
+    <div>
+      <h4>JWT Sessions</h4>
+      <p>Secure 24-hour encrypted sessions. Tokens are stored locally and validated server-side.</p>
+    </div>
+  </div>
+  <div class="feat-item">
+    <div class="feat-emoji">📊</div>
+    <div>
+      <h4>Activity Tracking</h4>
+      <p>Every login is logged with timestamp and IP address for your security audit trail.</p>
+    </div>
+  </div>
+  <div class="demo-box">
+    <div class="demo-label">🎯 Demo Credentials</div>
+    <div class="demo-cred"><span>Email</span><code>demo@medivision.ai</code></div>
+    <div class="demo-cred"><span>Password</span><code>demo123</code></div>
+    <div class="demo-cred"><span>OTP</span><code>123456</code></div>
+  </div>
+</div>
+
+<script>
+let pendingUserId = null;
+let timerInterval = null;
+let timerSeconds = 600;
+const digits = () => document.querySelectorAll('.otp-digit');
+
+// ── Auto-advance OTP boxes ──
+document.addEventListener('DOMContentLoaded', () => {
+  digits().forEach((inp, i, all) => {
+    inp.addEventListener('input', e => {
+      inp.value = inp.value.replace(/\D/g, '').slice(0,1);
+      inp.classList.toggle('filled', inp.value !== '');
+      inp.classList.remove('error');
+      if (inp.value && i < all.length - 1) all[i+1].focus();
+      if (getOtp().length === 6) doVerifyOtp();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) all[i-1].focus();
+    });
+    inp.addEventListener('paste', e => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      all.forEach((box, idx) => {
+        box.value = text[idx] || '';
+        box.classList.toggle('filled', box.value !== '');
+      });
+      if (text.length === 6) doVerifyOtp();
+    });
+  });
+});
+
+function getOtp() {
+  return Array.from(digits()).map(d => d.value).join('');
+}
+
+let currentRole = 'patient';
+function setRole(role) {
+  currentRole = role;
+  document.getElementById('btnPatient').classList.toggle('active', role === 'patient');
+  document.getElementById('btnDoctor').classList.toggle('active', role === 'doctor');
+  const bar = document.getElementById('doctorModeBar');
+  bar.classList.toggle('show', role === 'doctor');
+  document.getElementById('loginTitle').textContent = role === 'doctor' ? 'Doctor Portal' : 'Welcome back';
+  document.getElementById('loginSub').textContent = role === 'doctor'
+    ? 'Access your appointments & prescription panel'
+    : 'Sign in to your health dashboard';
+  document.getElementById('inEmail').placeholder = role === 'doctor' ? 'doctor@hospital.com' : 'you@example.com';
+}
+
+// ── Step 1: Password Login ──
+async function doLogin() {
+  const email = document.getElementById('inEmail').value.trim();
+  const password = document.getElementById('inPassword').value;
+  if (!email || !password) { showAlert('error', 'Please enter your email and password.'); return; }
+
+  setBtn('loginBtn', true, '🔄 Verifying...');
+  clearAlert();
+
+  try {
+    const res = await fetch('/api/auth/login/password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, role: currentRole })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      pendingUserId = data.user_id;
+
+      // Show OTP panel
+      showPanel('otp');
+      startTimer();
+
+      // Update hint
+      const hint = document.getElementById('otpHint');
+      if (data.demo_mode) {
+        hint.innerHTML = `<strong style="color:var(--teal-light)">Demo mode:</strong> Use OTP <strong style="color:#fff;font-size:18px">123456</strong>`;
+        fillOtp('123456');
+      } else {
+        hint.textContent = `OTP sent to ****${data.phone_hint}. Enter it below.`;
+      }
+    } else {
+      showAlert('error', data.error || 'Login failed. Please try again.');
+    }
+  } catch(e) {
+    showAlert('error', 'Connection error. Is the server running?');
+  }
+
+  setBtn('loginBtn', false, '🔑 Login');
+}
+
+// ── Step 2: OTP Verify ──
+async function doVerifyOtp() {
+  const otp = getOtp();
+  if (otp.length < 6) { showAlert('error', 'Please enter all 6 digits.'); return; }
+
+  setBtn('verifyBtn', true, '🔄 Verifying...');
+  clearAlert();
+
+  try {
+    const res = await fetch('/api/auth/login/otp/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ otp, user_id: pendingUserId })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('medivision_token', data.token);
+      localStorage.setItem('medivision_user', JSON.stringify(data.user));
+      showAlert('success', '🎉 Login successful! Redirecting...');
+      clearInterval(timerInterval);
+      setTimeout(() => window.location.href = data.user.role === 'doctor' ? '/doctor-dashboard' : '/dashboard', 900);
+    } else {
+      showAlert('error', data.error || 'Incorrect OTP.');
+      digits().forEach(d => { d.classList.add('error'); setTimeout(() => d.classList.remove('error'), 800); });
+      digits().forEach(d => d.value = '');
+      digits()[0].focus();
+    }
+  } catch(e) {
+    showAlert('error', 'Connection error. Please try again.');
+  }
+
+  setBtn('verifyBtn', false, '✅ Verify OTP');
+}
+
+// ── Resend ──
+async function doResend() {
+  const btn = document.getElementById('resendBtn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('/api/auth/otp/resend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: pendingUserId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAlert('info', data.message || 'OTP resent!');
+      if (data.demo_otp) fillOtp(data.demo_otp);
+      timerSeconds = 600; startTimer();
+    } else {
+      showAlert('error', data.error || 'Could not resend OTP.');
+    }
+  } catch(e) {
+    showAlert('error', 'Connection error.');
+  }
+
+  setTimeout(() => { btn.disabled = false; btn.textContent = 'Resend OTP'; }, 30000);
+  btn.textContent = 'Resend in 30s';
+}
+
+// ── Timer ──
+function startTimer() {
+  clearInterval(timerInterval);
+  timerSeconds = 600;
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    document.getElementById('timerDisplay').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    if (timerSeconds <= 0) { clearInterval(timerInterval); document.getElementById('timerDisplay').textContent = 'Expired'; }
+  }, 1000);
+}
+
+// ── Helpers ──
+function showPanel(name) {
+  document.getElementById('panelPassword').classList.remove('show');
+  document.getElementById('panelOtp').classList.remove('show');
+  document.getElementById(`panel${name.charAt(0).toUpperCase()+name.slice(1)}`).classList.add('show');
+  clearAlert();
+}
+
+function goBack() {
+  clearInterval(timerInterval);
+  digits().forEach(d => { d.value=''; d.classList.remove('filled','error'); });
+  showPanel('password');
+}
+
+function fillOtp(otp) {
+  const all = digits();
+  otp.split('').forEach((ch, i) => {
+    all[i].value = ch;
+    all[i].classList.add('filled');
+  });
+}
+
+function showAlert(type, msg) {
+  const box = document.getElementById('alertBox');
+  box.className = `alert alert-${type} show`;
+  box.innerHTML = (type==='error' ? '❌' : type==='success' ? '✅' : 'ℹ️') + ' ' + msg;
+}
+
+function clearAlert() {
+  const box = document.getElementById('alertBox');
+  box.className = 'alert';
+  box.textContent = '';
+}
+
+function setBtn(id, disabled, label) {
+  const btn = document.getElementById(id);
+  btn.disabled = disabled;
+  btn.innerHTML = disabled ? `<div class="spin"></div> ${label}` : label;
+}
+</script>
+</body>
+</html>

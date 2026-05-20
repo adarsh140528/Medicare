@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:\Users\Adarsh\Downloads\medivision_fixed_v6\medivision_fixed_v6\run_test_logic.py", line 3, in <module>
+    import test_logic
+  File "C:\Users\Adarsh\Downloads\medivision_fixed_v6\medivision_fixed_v6\test_logic.py", line 6, in <module>
+    from backend.utils.supabase_client import get_service_client
+  File "C:\Users\Adarsh\Downloads\medivision_fixed_v6\medivision_fixed_v6\backend\utils\supabase_client.py", line 3, in <module>
+    from supabase import create_client, Client
+  File "C:\Users\Adarsh\AppData\Local\Programs\Python\Python311\Lib\site-packages\supabase\__init__.py", line 3, in <module>
+    from realtime import AuthorizationError, NotConnectedError
+  File "C:\Users\Adarsh\AppData\Local\Programs\Python\Python311\Lib\site-packages\realtime\__init__.py", line 9, in <module>
+    from ._async.client import AsyncRealtimeClient
+  File "C:\Users\Adarsh\AppData\Local\Programs\Python\Python311\Lib\site-packages\realtime\_async\client.py", line 14, in <module>
+    from websockets.asyncio.client import ClientConnection
+ModuleNotFoundError: No module named 'websockets.asyncio'
