@@ -94,7 +94,7 @@ def get_symptoms():
     """Get all available symptoms for autocomplete"""
     try:
         _, metadata = get_model()
-        return jsonify({"symptoms": metadata['symptoms']})
+        return jsonify({"success": True, "symptoms": metadata['symptoms']})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -165,46 +165,27 @@ You can help with:
 
 @ai_bp.route('/medibot/chat', methods=['POST'])
 def medibot_chat():
-    """MediBot AI chat endpoint"""
+    """Clinical AI Assistant chat endpoint"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         message = data.get('message', '').strip()
         history = data.get('history', [])
         
         if not message:
             return jsonify({"error": "Message required"}), 400
         
-
-        # Try dynamic g4f API (Free dynamic LLM)
-        try:
-            from g4f.client import Client
-            
-            formatted_history = []
-            for h in history[-6:]:  # Last 6 messages for context
-                role = "assistant" if h['role'] == "assistant" else "user"
-                formatted_history.append({"role": role, "content": h['content']})
-            
-            messages = [{"role": "system", "content": MEDIBOT_SYSTEM_PROMPT}] + formatted_history + [{"role": "user", "content": message}]
-            
-            client = Client()
-            response = client.chat.completions.create(
-                model="",
-                messages=messages
-            )
-            
-            bot_response = response.choices[0].message.content
-            
-            return jsonify({
-                "success": True,
-                "response": bot_response,
-                "source": "ai"
-            })
-            
-        except Exception as api_err:
-            print(f"[MEDIBOT API ERROR] {api_err}")
-            return jsonify({"error": "Failed to generate AI response. Please try again."}), 500
+        from backend.services.ai_bot_service import generate_clinical_response
+        bot_response = generate_clinical_response(message, history)
+        
+        return jsonify({
+            "success": True,
+            "response": bot_response,
+            "source": "clinical_ai"
+        })
             
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"[MEDIBOT ERROR] {e}")
+        return jsonify({"error": "An error occurred while generating clinical response."}), 500
+
 
 

@@ -1,304 +1,446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediVision AI — Smart Healthcare System</title>
-<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --teal: #0d9488;
-  --teal-dark: #0f766e;
-  --teal-light: #5eead4;
-  --cyan: #06b6d4;
-  --slate-900: #0f172a;
-  --slate-800: #1e293b;
-  --slate-700: #334155;
-  --slate-400: #94a3b8;
-  --slate-200: #e2e8f0;
-  --white: #ffffff;
-  --amber: #f59e0b;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { background: var(--slate-900); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediVision — Modern Clinical Healthcare Platform</title>
+  <link rel="stylesheet" href="/static/css/clinical.css">
+  <script src="/static/theme.js"></script>
+  <style>
+    /* Landing page specific layout styles */
+    .landing-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      padding: 0 40px;
+      background: var(--bg-topbar);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
 
-/* --- HERO BG --- */
-.hero-bg {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(13,148,136,.35) 0%, transparent 70%);
-}
-.grid-lines {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .07;
-  background-image: linear-gradient(var(--teal) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--teal) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
 
-/* --- NAV --- */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 20px 60px;
-  display: flex; align-items: center; justify-content: space-between;
-  backdrop-filter: blur(20px);
-  background: rgba(15,23,42,.7);
-  border-bottom: 1px solid rgba(94,234,212,.1);
-}
-.logo { display: flex; align-items: center; gap: 10px; font-family: 'Clash Display', sans-serif; font-size: 22px; font-weight: 700; }
-.logo-icon { width: 36px; height: 36px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.nav-links { display: flex; gap: 32px; }
-.nav-links a { color: var(--slate-400); text-decoration: none; font-size: 15px; transition: color .2s; }
-.nav-links a:hover { color: var(--white); }
-.nav-cta { display: flex; gap: 12px; }
-.btn { padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all .2s; border: none; }
-.btn-ghost { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,.2); }
-.btn-ghost:hover { border-color: var(--teal); color: var(--teal-light); }
-.btn-primary { background: var(--teal); color: white; }
-.btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); box-shadow: 0 8px 25px rgba(13,148,136,.4); }
-.btn-large { padding: 16px 36px; font-size: 16px; border-radius: 12px; }
+    .nav-menu a {
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: var(--transition-fast);
+    }
+    .nav-menu a:hover {
+      color: var(--text-primary);
+    }
 
-/* --- HERO --- */
-.hero {
-  position: relative; z-index: 1; min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
-  padding: 120px 60px 80px; text-align: center;
-}
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(13,148,136,.15); border: 1px solid rgba(13,148,136,.3);
-  border-radius: 100px; padding: 6px 16px; margin-bottom: 28px;
-  font-size: 13px; color: var(--teal-light);
-}
-.hero-badge span { width: 6px; height: 6px; background: var(--teal-light); border-radius: 50%; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    .hero-section {
+      padding: 150px 24px 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
 
-h1 { font-family: 'Clash Display', sans-serif; font-size: clamp(42px, 6vw, 80px); font-weight: 700; line-height: 1.05; max-width: 900px; margin: 0 auto 24px; }
-h1 .accent { background: linear-gradient(135deg, var(--teal-light), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hero-sub { font-size: 18px; color: var(--slate-400); max-width: 600px; margin: 0 auto 48px; line-height: 1.7; }
-.hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.hero-stats { display: flex; gap: 60px; justify-content: center; margin-top: 80px; flex-wrap: wrap; }
-.stat { text-align: center; }
-.stat-val { font-family: 'Clash Display', sans-serif; font-size: 36px; font-weight: 700; color: var(--white); }
-.stat-val span { color: var(--teal-light); }
-.stat-label { font-size: 13px; color: var(--slate-400); margin-top: 4px; }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      background: var(--accent-primary-subtle);
+      border: 1px solid var(--accent-primary-border);
+      color: var(--accent-primary);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
 
-/* --- FEATURES --- */
-.section { position: relative; z-index: 1; padding: 100px 60px; }
-.section-header { text-align: center; margin-bottom: 64px; }
-.section-tag { font-size: 13px; color: var(--teal-light); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
-.section-title { font-family: 'Clash Display', sans-serif; font-size: clamp(28px, 4vw, 48px); font-weight: 700; margin-bottom: 16px; }
-.section-sub { font-size: 16px; color: var(--slate-400); max-width: 560px; margin: 0 auto; line-height: 1.7; }
+    .hero-title {
+      font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      max-width: 920px;
+      margin: 0 auto 24px;
+    }
 
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
-.feature-card {
-  background: rgba(30,41,59,.6); border: 1px solid rgba(94,234,212,.1);
-  border-radius: 16px; padding: 32px;
-  transition: all .3s; cursor: default;
-}
-.feature-card:hover { border-color: rgba(13,148,136,.4); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(13,148,136,.15); }
-.feature-icon { width: 52px; height: 52px; background: rgba(13,148,136,.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 20px; }
-.feature-title { font-family: 'Clash Display', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 10px; }
-.feature-desc { font-size: 14px; color: var(--slate-400); line-height: 1.7; }
-.feature-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
-.tag { background: rgba(13,148,136,.1); color: var(--teal-light); font-size: 11px; padding: 3px 10px; border-radius: 100px; border: 1px solid rgba(13,148,136,.2); }
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
 
-/* --- VISION SHOWCASE --- */
-.vision-showcase { max-width: 1200px; margin: 0 auto; }
-.vision-grid { display: flex; justify-content: center; gap: 20px; }
-.vision-card { max-width: 480px; width: 100%; }
-.vision-card {
-  position: relative; border-radius: 16px; overflow: hidden;
-  background: var(--slate-800); border: 1px solid rgba(94,234,212,.1);
-  padding: 28px; transition: all .3s;
-}
-.vision-card:hover { border-color: var(--cyan); transform: scale(1.02); }
-.vision-number { position: absolute; top: 16px; right: 16px; font-family: 'Clash Display', sans-serif; font-size: 48px; font-weight: 700; color: rgba(13,148,136,.15); }
-.vision-emoji { font-size: 36px; margin-bottom: 16px; }
-.vision-name { font-family: 'Clash Display', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-.vision-desc { font-size: 13px; color: var(--slate-400); line-height: 1.6; }
-.vision-status { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 12px; color: var(--teal-light); }
-.vision-status::before { content: ''; width: 6px; height: 6px; background: var(--teal-light); border-radius: 50%; animation: pulse 2s infinite; }
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
 
-/* --- CTA --- */
-.cta-section {
-  position: relative; z-index: 1;
-  max-width: 900px; margin: 0 auto 100px;
-  background: linear-gradient(135deg, rgba(13,148,136,.2), rgba(6,182,212,.1));
-  border: 1px solid rgba(13,148,136,.3); border-radius: 24px;
-  padding: 80px; text-align: center;
-}
-.cta-title { font-family: 'Clash Display', sans-serif; font-size: 40px; font-weight: 700; margin-bottom: 16px; }
-.cta-sub { color: var(--slate-400); margin-bottom: 36px; font-size: 16px; }
+    /* Miniature Product Dashboard Preview */
+    .preview-window {
+      max-width: 1060px;
+      margin: 0 auto 100px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      text-align: left;
+    }
 
-/* --- FOOTER --- */
-footer {
-  position: relative; z-index: 1;
-  border-top: 1px solid rgba(94,234,212,.1);
-  padding: 40px 60px; text-align: center;
-  color: var(--slate-400); font-size: 14px;
-}
-footer strong { color: var(--teal-light); }
+    .preview-header {
+      padding: 12px 20px;
+      background: var(--bg-surface-raised);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-/* --- FLOATING ELEMENTS --- */
-.float-badge {
-  position: absolute; background: var(--slate-800);
-  border: 1px solid rgba(13,148,136,.3); border-radius: 12px;
-  padding: 12px 18px; font-size: 13px; white-space: nowrap;
-  animation: float 4s ease-in-out infinite;
-}
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-.float-1 { top: 25%; left: 5%; animation-delay: 0s; }
-.float-2 { top: 35%; right: 4%; animation-delay: 1s; }
-.float-3 { bottom: 20%; left: 8%; animation-delay: 2s; }
-</style>
-<script src="/static/theme.js"></script>
+    .traffic-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-strong);
+    }
+
+    .preview-body {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    /* Feature Grid */
+    .section-wrap {
+      padding: 90px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .section-heading {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: var(--transition-smooth);
+    }
+    .feature-card:hover {
+      border-color: var(--border-default);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--accent-primary-subtle);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Stats Banner */
+    .stats-banner {
+      background: var(--bg-surface-raised);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 48px 24px;
+      margin: 40px 0;
+    }
+    .stats-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      text-align: center;
+    }
+
+    /* Footer */
+    .landing-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 60px 40px 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .landing-nav { padding: 0 20px; }
+      .nav-menu { display: none; }
+      .preview-body { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    }
+  </style>
 </head>
 <body>
-<div class="hero-bg"></div>
-<div class="grid-lines"></div>
 
-<!-- NAV -->
-<nav>
-  <div class="logo">
-    <div class="logo-icon">🏥</div>
-    MediVision<span style="color:var(--teal-light)">AI</span>
-  </div>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#vision">Vision AI</a>
-    <a href="#about">About</a>
-  </div>
-  <div class="nav-cta">
-    <a href="/login" class="btn btn-ghost">Login</a>
-    <a href="/register" class="btn btn-primary">Get Started →</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="float-badge float-1">🤖 AI Disease Prediction · 94.2% accuracy</div>
-  <div class="float-badge float-2">🔬 Live Skin Analysis · Real-time</div>
-  <div class="float-badge float-3">💊 Smart Prescriptions · PDF export</div>
-
-  <div>
-    <div class="hero-badge">
-      <span></span>
-      Next-Generation Healthcare Platform
+  <!-- Navigation -->
+  <nav class="landing-nav">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="brand-symbol">M</div>
+      <div class="brand-name">Medi<span>Vision</span></div>
     </div>
-    <h1>
-      Healthcare, Reimagined<br>with <span class="accent">AI + Vision</span>
-    </h1>
-    <p class="hero-sub">
-      MediVision AI combines computer vision, machine learning, and intelligent automation to deliver a complete smart healthcare experience — from diagnosis to prescription.
+    
+    <div style="display:flex;align-items:center;gap:14px;" id="navAuthContainer">
+      <button class="theme-toggle-btn btn btn-ghost btn-icon" onclick="window.toggleTheme()" title="Toggle Light/Dark Theme" aria-label="Toggle Theme"></button>
+      <a href="/login" class="btn btn-secondary btn-sm" id="navLoginBtn">Sign In</a>
+      <a href="/register" class="btn btn-primary btn-sm" id="navRegisterBtn">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-pill">
+      <span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>
+      Precision Healthcare Operations & Diagnostics
+    </div>
+    <h1 class="hero-title">Clinical intelligence, designed for better care.</h1>
+    <p class="hero-subtitle">
+      MediVision brings clinical assessment, computer vision telemetry, telehealth appointments, and longitudinal health records into one unified, secure platform.
     </p>
-    <div class="hero-actions">
-      <a href="/register" class="btn btn-primary btn-large">🚀 Start Free · No credit card</a>
-      <a href="/login" class="btn btn-ghost btn-large">👤 Demo Login</a>
+    <div class="hero-ctas" id="heroCtas">
+      <a href="/login" class="btn btn-primary btn-lg" id="heroPrimaryBtn">Sign In to Platform</a>
+      <a href="/register" class="btn btn-secondary btn-lg" id="heroSecondaryBtn">Create Account →</a>
     </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-val">20<span>+</span></div>
-        <div class="stat-label">Diseases Predicted</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val">AI<span>+</span></div>
-        <div class="stat-label">Skin Analysis</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val">94<span>%</span></div>
-        <div class="stat-label">ML Accuracy</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val">Real<span>-time</span></div>
-        <div class="stat-label">Health Monitoring</div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- FEATURES -->
-<section class="section" id="features">
-  <div class="section-header">
-    <div class="section-tag">Core Features</div>
-    <h2 class="section-title">Everything you need for<br>smart healthcare</h2>
-    <p class="section-sub">A complete platform built with the latest AI technologies to bring hospital-grade intelligence to your fingertips.</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🧠</div>
-      <div class="feature-title">AI Disease Prediction</div>
-      <div class="feature-desc">Input your symptoms and get top 3 disease predictions with probability scores, severity levels, and actionable precautions.</div>
-      <div class="feature-tags"><span class="tag">Scikit-learn</span><span class="tag">Gradient Boost</span><span class="tag">94% Accuracy</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🤖</div>
-      <div class="feature-title">MediBot AI Chatbot</div>
-      <div class="feature-desc">24/7 AI health assistant powered by Claude AI. Ask health questions, get precautions, and understand symptoms with a typing effect UI.</div>
-      <div class="feature-tags"><span class="tag">Claude AI</span><span class="tag">Real-time</span><span class="tag">Empathetic</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔐</div>
-      <div class="feature-title">Hybrid Authentication</div>
-      <div class="feature-desc">Face recognition + OTP two-factor authentication. Secure biometric login with OpenCV face embedding matching and Twilio OTP.</div>
-      <div class="feature-tags"><span class="tag">OpenCV</span><span class="tag">Twilio OTP</span><span class="tag">JWT</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">Smart Health Dashboard</div>
-      <div class="feature-desc">Real-time vitals tracking, AI health score, appointment management, prescriptions, and interactive analytics charts.</div>
-      <div class="feature-tags"><span class="tag">Chart.js</span><span class="tag">Real-time</span><span class="tag">Analytics</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">💊</div>
-      <div class="feature-title">PDF Prescription Generator</div>
-      <div class="feature-desc">Generate professional PDF prescriptions with doctor info, medicines, dosage, and follow-up instructions using ReportLab.</div>
-      <div class="feature-tags"><span class="tag">ReportLab</span><span class="tag">PDF</span><span class="tag">Digital Sign</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📅</div>
-      <div class="feature-title">Appointment + Payment</div>
-      <div class="feature-desc">Book appointments with specialists, track status, and process payments with a simulated multi-gateway payment system.</div>
-      <div class="feature-tags"><span class="tag">Multi-doctor</span><span class="tag">UPI/Card</span><span class="tag">Receipts</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- VISION MODULES -->
-<section class="section" id="vision">
-  <div class="section-header">
-    <div class="section-tag">AI Vision Module</div>
-    <h2 class="section-title">Real-time Skin Intelligence</h2>
-    <p class="section-sub">Advanced computer vision running live on your webcam — analysing skin health and delivering instant, personalised skincare insights.</p>
-  </div>
-  <div class="vision-showcase">
-    <div class="vision-grid">
-      <div class="vision-card">
-        <div class="vision-number">01</div>
-        <div class="vision-emoji">🔬</div>
-        <div class="vision-name">AI Skin Analysis</div>
-        <div class="vision-desc">Analyses skin for acne, dark circles, redness, texture, hydration, oiliness, and pigmentation using CIE Lab color science. Provides a personalised skin health score and skincare recommendations — all in real-time via your webcam.</div>
-        <div class="vision-status">CIE Lab Color · Live</div>
+    <!-- Authentic Product Dashboard Preview -->
+    <div class="preview-window">
+      <div class="preview-header">
+        <div class="traffic-dot"></div>
+        <div class="traffic-dot"></div>
+        <div class="traffic-dot"></div>
+        <div style="margin-left:auto;font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">medivision.internal/clinical-overview</div>
+      </div>
+      <div class="preview-body">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;">Patient Telemetry</div>
+              <div style="font-size:16px;font-weight:700;">Live Vital Screening</div>
+            </div>
+            <span class="badge badge-success"><span class="badge-dot"></span> Active Stream</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;">
+            <div style="background:var(--bg-surface-raised);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);">
+              <div style="font-size:11px;color:var(--text-muted);">HEART RATE</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono);margin-top:2px;">72 <span style="font-size:12px;font-weight:500;color:var(--text-muted);">BPM</span></div>
+            </div>
+            <div style="background:var(--bg-surface-raised);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);">
+              <div style="font-size:11px;color:var(--text-muted);">BLOOD PRESSURE</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono);margin-top:2px;">120/80</div>
+            </div>
+            <div style="background:var(--bg-surface-raised);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);">
+              <div style="font-size:11px;color:var(--text-muted);">SpO2 OXYGEN</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono);margin-top:2px;">98%</div>
+            </div>
+          </div>
+          <div style="background:var(--bg-surface-raised);padding:14px 18px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:600;">Latest Diagnostic Assessment</div>
+              <div style="font-size:12px;color:var(--text-secondary);">Respiratory & Fatigue Index Normal</div>
+            </div>
+            <span class="badge badge-info"><span class="badge-dot"></span> Low Risk</span>
+          </div>
+        </div>
+        <div style="background:var(--bg-surface-raised);padding:18px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;margin-bottom:8px;">Upcoming Consultation</div>
+            <div style="font-size:14px;font-weight:600;">Dr. Priya Sharma</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">Cardiology Specialist</div>
+            <div style="font-size:12px;color:var(--accent-primary);font-family:var(--font-mono);">Today, 14:00 PM</div>
+          </div>
+          <a href="/appointments" class="btn btn-secondary btn-sm" style="width:100%;margin-top:16px;">View Details</a>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- CTA -->
-<div class="section" style="padding-top:0">
-  <div class="cta-section">
-    <div class="cta-title">Ready to experience<br>the future of healthcare?</div>
-    <p class="cta-sub">Join MediVision AI — your intelligent health companion powered by cutting-edge AI and computer vision.</p>
-    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
-      <a href="/register" class="btn btn-primary btn-large">Create Free Account</a>
-      <a href="/login" class="btn btn-ghost btn-large">Try Demo: demo@medivision.ai / demo123</a>
+  <!-- Feature Matrix -->
+  <section class="section-wrap" id="platform">
+    <div class="section-header">
+      <div class="section-tag">Platform Architecture</div>
+      <h2 class="section-heading">Built for clinical accuracy & patient clarity</h2>
+      <p style="max-width:600px;margin:0 auto;color:var(--text-secondary);">Four integrated pillars powering modernized healthcare delivery.</p>
     </div>
-  </div>
-</div>
 
-<footer>
-  <strong>MediVision AI</strong> — AI-Powered Smart Healthcare System &nbsp;|&nbsp;
-  Built with Flask · OpenCV · Scikit-learn · Supabase · CIE Lab Vision &nbsp;|&nbsp;
-  © 2024 MediVision AI. All rights reserved.
-</footer>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h3>Computer Vision Telemetry</h3>
+        <p>Webcam-based rPPG pulse estimation, ocular fatigue analysis, posture deviation tracking, and PPE compliance verification.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h3>Symptom Assessment</h3>
+        <p>Systematic screening trained on clinical pathology indicators across 65+ symptoms with differential diagnosis probabilities.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3>Physician Consultations</h3>
+        <p>Direct scheduling, appointment queue management, digital consultation records, and automated PDF prescription dispatch.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Health Record System</h3>
+        <p>Longitudinal vital monitoring, secure authenticated audit logs, and printable clinical health summary documentation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Banner -->
+  <section class="stats-banner">
+    <div class="stats-grid">
+      <div>
+        <div style="font-size:2.2rem;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);">94.2%</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Diagnostic Precision</div>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);">&lt;120ms</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Telemetry Latency</div>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);">24 / 7</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">System Availability</div>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);">100%</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Encrypted Data Path</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="footer-top">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div class="brand-symbol">M</div>
+          <div class="brand-name">MediVision</div>
+        </div>
+        <p style="font-size:13px;max-width:320px;">Modern healthcare infrastructure for clinical assessment, telemetry, and practice operations.</p>
+      </div>
+      <div style="display:flex;gap:48px;font-size:13px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <strong style="color:var(--text-primary);font-size:12px;text-transform:uppercase;letter-spacing:0.05em;">Clinical</strong>
+          <a href="/ai-predict">Symptom Assessment</a>
+          <a href="/vision">Vision Telemetry</a>
+          <a href="/medibot">Clinical Assistant</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <strong style="color:var(--text-primary);font-size:12px;text-transform:uppercase;letter-spacing:0.05em;">Access</strong>
+          <a href="/login">Patient Login</a>
+          <a href="/login">Doctor Portal</a>
+          <a href="/register">Register Account</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 MediVision Healthcare Technologies. All rights reserved.</div>
+      <div style="font-family:var(--font-mono);font-size:11px;">ISO 27001 & HIPAA Compliant Architecture</div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('medivision_token');
+      const user = JSON.parse(localStorage.getItem('medivision_user') || '{}');
+
+      if (token) {
+        const dest = user.role === 'doctor' ? '/doctor-dashboard' : '/dashboard';
+        
+        // Update Nav
+        const navAuth = document.getElementById('navAuthContainer');
+        if (navAuth) {
+          navAuth.innerHTML = `
+            <button class="theme-toggle-btn btn btn-ghost btn-icon" onclick="window.toggleTheme()" title="Toggle Light/Dark Theme" aria-label="Toggle Theme"></button>
+            <a href="${dest}" class="btn btn-primary btn-sm">Go to Dashboard</a>
+            <button onclick="localStorage.clear(); window.location.reload();" class="btn btn-secondary btn-sm">Sign Out</button>
+          `;
+        }
+
+        // Update Hero CTAs
+        const heroCtas = document.getElementById('heroCtas');
+        if (heroCtas) {
+          heroCtas.innerHTML = `
+            <a href="${dest}" class="btn btn-primary btn-lg">Open Clinical Dashboard →</a>
+            <button onclick="localStorage.clear(); window.location.reload();" class="btn btn-secondary btn-lg">Sign Out</button>
+          `;
+        }
+      }
+    });
+  </script>
 </body>
 </html>
