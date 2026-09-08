@@ -24,6 +24,8 @@ def create_env():
         shutil.copy(example_path, env_path)
         print("Created .env from template. Edit it with your credentials.\n")
 
+from app import app, socketio
+
 if __name__ == '__main__':
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -40,6 +42,6 @@ if __name__ == '__main__':
     print("📍 Open http://localhost:5000 in your browser")
     print("─" * 50)
     
-    from app import socketio, app
     port = int(os.getenv('FLASK_PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
+
