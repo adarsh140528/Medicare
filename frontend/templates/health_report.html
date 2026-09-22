@@ -341,7 +341,9 @@
   <script>
     async function generateDynamicReport() {
       const token = localStorage.getItem('medivision_token');
+      const userObj = JSON.parse(localStorage.getItem('medivision_user') || '{}');
       if(!token) { window.location.href='/login'; return; }
+      if (userObj.role === 'doctor') { window.location.href='/doctor-dashboard'; return; }
 
       try {
         const res = await fetch('/api/dashboard/overview', {

@@ -24,21 +24,33 @@ def get_client():
 
 
 def get_service_client():
-    """Service-role client — falls back to SQLite client if Supabase is unconfigured."""
+    """Service-role client — uses service key if valid JWT, else falls back to anon key, else SQLite."""
     global _service_client
     url = os.getenv('SUPABASE_URL')
-    key = os.getenv('SUPABASE_SERVICE_KEY') or os.getenv('SUPABASE_KEY')
-    if not url or not key:
+    service_key = os.getenv('SUPABASE_SERVICE_KEY')
+    anon_key = os.getenv('SUPABASE_KEY')
+
+    if not url or not (service_key or anon_key):
         return SQLiteClient()
-    try:
-        anon_key = os.getenv('SUPABASE_KEY', '')
-        cached_with_anon = (_service_client is not None and key == anon_key
-                            and os.getenv('SUPABASE_SERVICE_KEY'))
-        if _service_client is None or cached_with_anon or isinstance(_service_client, SQLiteClient):
+
+    # Prefer key that looks like a JWT or valid token
+    keys_to_try = []
+    if service_key and service_key.startswith('eyJ'):
+        keys_to_try.append(service_key)
+    if anon_key and anon_key.startswith('eyJ'):
+        keys_to_try.append(anon_key)
+    if service_key and service_key not in keys_to_try:
+        keys_to_try.append(service_key)
+    if anon_key and anon_key not in keys_to_try:
+        keys_to_try.append(anon_key)
+
+    for k in keys_to_try:
+        try:
             from supabase import create_client
-            _service_client = create_client(url, key)
-        return _service_client
-    except Exception as e:
-        print(f"[SUPABASE-SERVICE-CLIENT] Falling back to SQLite: {e}")
-        return SQLiteClient()
+            _service_client = create_client(url, k)
+            return _service_client
+        except Exception:
+            continue
+
+    return SQLiteClient()
 

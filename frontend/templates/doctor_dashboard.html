@@ -9,7 +9,7 @@
   <style>
     .doctor-metric-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -17,6 +17,7 @@
     .action-group {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
 
     .rx-row {
@@ -27,15 +28,23 @@
       align-items: center;
     }
 
-    @media (max-width: 900px) {
+    .section-anchor {
+      scroll-margin-top: 80px;
+    }
+
+    @media (max-width: 1024px) {
+      .doctor-metric-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
       .doctor-metric-grid { grid-template-columns: 1fr; }
+      .rx-row { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
 </head>
 <body>
 
 <div class="app-layout">
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (PHYSICIAN ONLY) -->
   <aside class="app-sidebar">
     <a href="/doctor-dashboard" class="sidebar-brand">
       <div class="brand-symbol">M</div>
@@ -44,30 +53,26 @@
 
     <nav class="sidebar-nav">
       <div class="nav-category">Physician Workspace</div>
-      <a class="nav-link active">
+      <a href="#today-queue" class="nav-link active" id="navSchedule" onclick="switchNav(this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Today's Schedule
+        Consultation Schedule
       </a>
-      <a class="nav-link" onclick="openPrescriptionModalDirect()">
+      <a href="#prescriptions-section" class="nav-link" id="navPrescriptions" onclick="switchNav(this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
-        Issue Prescription
+        Issued Prescriptions
       </a>
-      <a class="nav-link" href="/vision">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        Vision Telemetry
-      </a>
-      <a class="nav-link" href="/ai-predict">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Diagnostic Screening
+      <a class="nav-link" onclick="openPrescriptionModalDirect()" style="cursor:pointer;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        + New Prescription
       </a>
     </nav>
 
     <div class="sidebar-footer">
       <div class="user-snippet">
-        <div class="user-avatar" id="docAvatar" style="background:var(--accent-primary-subtle);color:var(--accent-primary);">Dr</div>
+        <div class="user-avatar" id="docAvatar" style="background:var(--accent-primary-subtle);color:var(--accent-primary);font-weight:700;">Dr</div>
         <div class="user-meta">
           <div class="user-meta-name" id="doctorName">Dr. Physician</div>
-          <div class="user-meta-role">Attending Specialist</div>
+          <div class="user-meta-role">Attending Physician</div>
         </div>
       </div>
       <button class="btn btn-ghost btn-icon btn-sm" onclick="logout()" title="Sign Out">
@@ -84,11 +89,11 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <div class="topbar-breadcrumbs">
-          <span>Clinical</span> / <span>Physician Consultation Queue</span>
+          <span>Physician Portal</span> / <span id="topbarSectionTitle">Consultation Queue & Prescriptions</span>
         </div>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-primary btn-sm" onclick="openPrescriptionModalDirect()">+ New Prescription</button>
+        <button class="btn btn-primary btn-sm" onclick="openPrescriptionModalDirect()">+ Issue Prescription</button>
         <button class="theme-toggle-btn btn btn-ghost btn-icon" onclick="window.toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme"></button>
       </div>
     </header>
@@ -111,14 +116,19 @@
           <div class="stat-value" id="confirmedCount">0</div>
           <div class="stat-footer">Ready for consultation</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">Prescriptions Signed</div>
+          <div class="stat-value" id="rxCount">0</div>
+          <div class="stat-footer">Total issued digital Rx</div>
+        </div>
       </div>
 
-      <!-- Queue Card -->
-      <div class="card" style="margin-bottom:24px;">
+      <!-- Today's Queue Card -->
+      <div class="card section-anchor" id="today-queue" style="margin-bottom:24px;">
         <div class="card-header">
           <div>
             <div class="card-title">Today's Appointment Queue</div>
-            <div class="card-desc">Patient intake and status controls</div>
+            <div class="card-desc">Slotted patients scheduled for today — triage and prescribe directly</div>
           </div>
         </div>
 
@@ -126,27 +136,27 @@
           <table class="clinical-table">
             <thead>
               <tr>
-                <th>Patient / ID</th>
+                <th>Patient Name</th>
                 <th>Time Slot</th>
                 <th>Reason for Visit</th>
-                <th>Payment Status</th>
+                <th>Payment</th>
                 <th>Intake Status</th>
-                <th>Actions</th>
+                <th>Consultation Actions</th>
               </tr>
             </thead>
             <tbody id="todayApptsList">
-              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading appointment queue...</td></tr>
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading today's appointment queue...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Historical All Schedule Card -->
-      <div class="card">
+      <!-- Forward & Historical Schedule Card -->
+      <div class="card section-anchor" id="all-schedule" style="margin-bottom:24px;">
         <div class="card-header">
           <div>
-            <div class="card-title">All Scheduled Consultations</div>
-            <div class="card-desc">Complete forward schedule across all dates</div>
+            <div class="card-title">All Booked Consultations</div>
+            <div class="card-desc">Complete forward schedule across all booked dates</div>
           </div>
         </div>
 
@@ -156,13 +166,44 @@
               <tr>
                 <th>Date</th>
                 <th>Time Slot</th>
-                <th>Patient / Reason</th>
+                <th>Patient Name</th>
+                <th>Reason for Visit</th>
+                <th>Payment</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="allApptsList">
-              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">Loading consultations...</td></tr>
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">Loading consultations...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Issued Prescriptions History Card -->
+      <div class="card section-anchor" id="prescriptions-section">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Issued Digital Prescriptions</div>
+            <div class="card-desc">History of prescriptions signed and issued by you</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openPrescriptionModalDirect()">+ Issue New Rx</button>
+        </div>
+
+        <div class="table-container">
+          <table class="clinical-table">
+            <thead>
+              <tr>
+                <th>Rx ID</th>
+                <th>Date Issued</th>
+                <th>Patient Name</th>
+                <th>Clinical Diagnosis</th>
+                <th>Medications Prescribed</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="issuedRxList">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading issued prescriptions...</td></tr>
             </tbody>
           </table>
         </div>
@@ -182,23 +223,25 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">Patient Record</label>
-      <input type="text" id="rxPatientSelect" placeholder="Patient Name or ID" readonly>
+      <label class="form-label" for="rxPatientSelect">Select Booked Patient *</label>
+      <select id="rxPatientSelect" class="form-select" style="width:100%;padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--border-default);background:var(--bg-surface-raised);color:var(--text-primary);font-size:14px;" onchange="onPatientSelectChange()">
+        <option value="">-- Choose Booked Patient --</option>
+      </select>
     </div>
 
     <div class="form-group">
       <label class="form-label" for="rxDiagnosis">Clinical Diagnosis *</label>
-      <input type="text" id="rxDiagnosis" placeholder="e.g. Acute Upper Respiratory Infection, Mild Hypertension" required>
+      <input type="text" id="rxDiagnosis" placeholder="e.g. Acute Upper Respiratory Infection, Hypertension" required>
     </div>
 
     <div class="form-group">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <label class="form-label" style="margin-bottom:0;">Prescribed Medications</label>
+        <label class="form-label" style="margin-bottom:0;">Prescribed Medications *</label>
         <button type="button" class="btn btn-secondary btn-sm" onclick="addMedicineRow()">+ Add Medication</button>
       </div>
       <div id="rxMedicines">
         <div class="rx-row">
-          <input type="text" placeholder="Medication Name" class="rx-name" value="Amoxicillin 500mg">
+          <input type="text" placeholder="Medication Name" class="rx-name" value="Paracetamol 650mg">
           <input type="text" placeholder="Dosage" class="rx-dose" value="1 tablet">
           <input type="text" placeholder="Frequency" class="rx-freq" value="TDS (3x daily)">
           <input type="text" placeholder="Duration" class="rx-dur" value="5 days">
@@ -209,7 +252,7 @@
 
     <div class="form-group">
       <label class="form-label" for="rxNotes">Physician Clinical Instructions</label>
-      <textarea id="rxNotes" rows="2" placeholder="Take after meals. Maintain fluid intake..."></textarea>
+      <textarea id="rxNotes" rows="2" placeholder="Take after meals with water. Maintain fluid intake and rest."></textarea>
     </div>
 
     <div class="form-group">
@@ -228,18 +271,31 @@
   const token = localStorage.getItem('medivision_token');
   const user = JSON.parse(localStorage.getItem('medivision_user') || '{}');
 
-  if (!token || user.role !== 'doctor') {
+  if (!token) {
     window.location.href = '/login';
+  } else if (user.role !== 'doctor') {
+    window.location.href = '/dashboard';
   }
 
   document.getElementById('doctorName').textContent = user.full_name || 'Dr. Physician';
   if (user.full_name) {
-    document.getElementById('docAvatar').textContent = user.full_name.replace('Dr. ', '').substring(0, 2).toUpperCase();
+    const initials = user.full_name.replace('Dr. ', '').substring(0, 2).toUpperCase();
+    document.getElementById('docAvatar').textContent = initials || 'DR';
   }
 
   let currentAppts = [];
+  let currentPrescriptions = [];
+
+  function switchNav(el) {
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
 
   async function loadDoctorDashboard() {
+    await Promise.all([loadAppointments(), loadPrescriptions()]);
+  }
+
+  async function loadAppointments() {
     try {
       const res = await fetch('/api/appointments/doctor-list', {
         headers: { 'Authorization': 'Bearer ' + token }
@@ -249,10 +305,51 @@
       if (data.success && data.appointments) {
         currentAppts = data.appointments;
         renderDoctorSchedule(currentAppts);
+        populatePatientDropdown(currentAppts);
       }
     } catch (e) {
       console.error('Error fetching doctor schedule:', e);
     }
+  }
+
+  async function loadPrescriptions() {
+    try {
+      const res = await fetch('/api/prescriptions/list', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+
+      if (data.success && data.prescriptions) {
+        currentPrescriptions = data.prescriptions;
+        document.getElementById('rxCount').textContent = currentPrescriptions.length;
+        renderIssuedPrescriptions(currentPrescriptions);
+      }
+    } catch (e) {
+      console.error('Error fetching prescriptions:', e);
+    }
+  }
+
+  function populatePatientDropdown(appts) {
+    const select = document.getElementById('rxPatientSelect');
+    // Keep unique patients
+    const patientMap = new Map();
+    appts.forEach(a => {
+      if (a.patient_id && !patientMap.has(a.patient_id)) {
+        patientMap.set(a.patient_id, {
+          id: a.patient_id,
+          name: a.patient_name || ('Patient #' + a.patient_id.substring(0, 6)),
+          apptId: a.id,
+          reason: a.reason || 'Consultation'
+        });
+      }
+    });
+
+    let html = '<option value="">-- Choose Booked Patient --</option>';
+    patientMap.forEach(p => {
+      html += `<option value="${p.id}" data-apptid="${p.apptId}">${p.name} (ID: ${p.id.substring(0, 8)}) — ${p.reason}</option>`;
+    });
+    html += '<option value="walk-in">Direct / Walk-in Consultation</option>';
+    select.innerHTML = html;
   }
 
   function renderDoctorSchedule(appts) {
@@ -267,54 +364,112 @@
     if (todayAppts.length === 0) {
       todayTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">No consultations scheduled for today.</td></tr>';
     } else {
-      todayTbody.innerHTML = todayAppts.map(a => `
-        <tr>
-          <td>
-            <strong>${a.patient_id ? 'Patient #' + a.patient_id.substring(0,6) : 'Walk-in Patient'}</strong>
-          </td>
-          <td class="mono">${a.appointment_time || '10:00'}</td>
-          <td>${a.reason || 'General checkup'}</td>
-          <td>
-            <span class="badge ${a.payment_status === 'paid' ? 'badge-success' : 'badge-neutral'}">
-              <span class="badge-dot"></span> ${a.payment_status || 'unpaid'}
-            </span>
-          </td>
-          <td>
-            <span class="badge ${a.status === 'confirmed' ? 'badge-success' : (a.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">
-              <span class="badge-dot"></span> ${a.status}
-            </span>
-          </td>
-          <td>
-            <div class="action-group">
-              ${a.status === 'pending' ? `<button class="btn btn-primary btn-sm" onclick="acceptAppointment('${a.id}')">Accept</button>` : ''}
-              ${a.payment_status !== 'paid' ? `<button class="btn btn-secondary btn-sm" onclick="markPaid('${a.id}')">Mark Paid</button>` : ''}
-              <button class="btn btn-ghost btn-sm" onclick="openPrescriptionModal('${a.patient_id}', '${a.id}')">Rx</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+      todayTbody.innerHTML = todayAppts.map(a => {
+        const pName = a.patient_name || (a.patient_id ? 'Patient #' + a.patient_id.substring(0, 8) : 'Patient');
+        return `
+          <tr>
+            <td>
+              <strong>${pName}</strong>
+              <div style="font-size:11px;color:var(--text-muted);">ID: ${a.patient_id ? a.patient_id.substring(0, 8) : 'Direct'}</div>
+            </td>
+            <td class="mono"><strong>${a.appointment_time || '10:00'}</strong></td>
+            <td>${a.reason || 'General checkup'}</td>
+            <td>
+              <span class="badge ${a.payment_status === 'paid' ? 'badge-success' : 'badge-neutral'}">
+                <span class="badge-dot"></span> ${a.payment_status || 'unpaid'}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${a.status === 'confirmed' ? 'badge-success' : (a.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">
+                <span class="badge-dot"></span> ${a.status}
+              </span>
+            </td>
+            <td>
+              <div class="action-group">
+                ${a.status === 'pending' ? `<button class="btn btn-primary btn-sm" onclick="acceptAppointment('${a.id}')">Accept</button>` : ''}
+                ${a.payment_status !== 'paid' ? `<button class="btn btn-secondary btn-sm" onclick="markPaid('${a.id}')">Mark Paid</button>` : ''}
+                <button class="btn btn-primary btn-sm" onclick="openPrescriptionModalForPatient('${a.patient_id || ''}', '${a.id}', '${pName.replace(/'/g, "\\'")}')" title="Issue digital prescription for this booked patient">
+                  📝 Prescribe (Rx)
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     const allTbody = document.getElementById('allApptsList');
     if (appts.length === 0) {
-      allTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">No historical or future bookings.</td></tr>';
+      allTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No consultations found.</td></tr>';
     } else {
-      allTbody.innerHTML = appts.map(a => `
+      allTbody.innerHTML = appts.map(a => {
+        const pName = a.patient_name || (a.patient_id ? 'Patient #' + a.patient_id.substring(0, 8) : 'Patient');
+        return `
+          <tr>
+            <td class="mono">${a.appointment_date}</td>
+            <td class="mono"><strong>${a.appointment_time}</strong></td>
+            <td>
+              <strong>${pName}</strong>
+            </td>
+            <td>${a.reason || 'Consultation'}</td>
+            <td>
+              <span class="badge ${a.payment_status === 'paid' ? 'badge-success' : 'badge-neutral'}">
+                ${a.payment_status || 'unpaid'}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${a.status === 'confirmed' ? 'badge-success' : 'badge-warning'}">
+                <span class="badge-dot"></span> ${a.status}
+              </span>
+            </td>
+            <td>
+              <div class="action-group">
+                ${a.status === 'pending' ? `<button class="btn btn-primary btn-sm" onclick="acceptAppointment('${a.id}')">Accept</button>` : ''}
+                <button class="btn btn-secondary btn-sm" onclick="openPrescriptionModalForPatient('${a.patient_id || ''}', '${a.id}', '${pName.replace(/'/g, "\\'")}')">
+                  + Prescription
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  function renderIssuedPrescriptions(rxList) {
+    const tbody = document.getElementById('issuedRxList');
+    if (rxList.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--text-muted);">No digital prescriptions issued yet. Click "+ Issue Prescription" to create one.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rxList.map(rx => {
+      let meds = [];
+      if (Array.isArray(rx.medicines)) {
+        meds = rx.medicines;
+      } else if (typeof rx.medicines === 'string') {
+        try { meds = JSON.parse(rx.medicines); } catch (e) {}
+      }
+
+      const medSummary = meds.map(m => m.name).slice(0, 2).join(', ') + (meds.length > 2 ? ` (+${meds.length - 2} more)` : '');
+      const pName = rx.patient_name || (rx.patient_id ? 'Patient #' + rx.patient_id.substring(0, 8) : 'Patient');
+      const dateStr = rx.created_at ? new Date(rx.created_at).toLocaleDateString() : 'Today';
+
+      return `
         <tr>
-          <td class="mono">${a.appointment_date}</td>
-          <td class="mono">${a.appointment_time}</td>
-          <td>${a.reason || 'Consultation'}</td>
+          <td class="mono" style="font-weight:600;color:var(--accent-primary);">Rx #${rx.id ? rx.id.substring(0, 8).toUpperCase() : 'RX'}</td>
+          <td class="mono">${dateStr}</td>
+          <td><strong>${pName}</strong></td>
+          <td><span class="badge badge-neutral">${rx.diagnosis || 'Clinical Assessment'}</span></td>
+          <td style="font-size:12.5px;color:var(--text-secondary);">${medSummary || 'Standard regimen'}</td>
           <td>
-            <span class="badge ${a.status === 'confirmed' ? 'badge-success' : 'badge-warning'}">
-              <span class="badge-dot"></span> ${a.status}
-            </span>
-          </td>
-          <td>
-            <button class="btn btn-secondary btn-sm" onclick="openPrescriptionModal('${a.patient_id}', '${a.id}')">+ Prescription</button>
+            <button class="btn btn-secondary btn-sm" onclick='downloadPdf(${JSON.stringify(rx)})'>
+              Download PDF 📄
+            </button>
           </td>
         </tr>
-      `).join('');
-    }
+      `;
+    }).join('');
   }
 
   async function acceptAppointment(id) {
@@ -325,7 +480,7 @@
       });
       const data = await res.json();
       if (data.success) {
-        loadDoctorDashboard();
+        loadAppointments();
       }
     } catch (e) {
       alert('Error accepting consultation.');
@@ -340,7 +495,7 @@
       });
       const data = await res.json();
       if (data.success) {
-        loadDoctorDashboard();
+        loadAppointments();
       }
     } catch (e) {
       alert('Error marking payment.');
@@ -348,15 +503,53 @@
   }
 
   let currentTargetPatient = null, currentTargetAppt = null;
-  function openPrescriptionModal(patientId, appointmentId) {
+
+  function openPrescriptionModalForPatient(patientId, appointmentId, patientName) {
     currentTargetPatient = patientId;
     currentTargetAppt = appointmentId;
-    document.getElementById('rxPatientSelect').value = patientId ? 'Patient #' + patientId.substring(0, 8) : 'Direct Intake';
+    
+    const select = document.getElementById('rxPatientSelect');
+    if (patientId) {
+      let optionExists = false;
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === patientId) {
+          select.selectedIndex = i;
+          optionExists = true;
+          break;
+        }
+      }
+      if (!optionExists) {
+        const opt = document.createElement('option');
+        opt.value = patientId;
+        opt.textContent = `${patientName || 'Patient'} (${patientId.substring(0, 8)})`;
+        opt.selected = true;
+        select.appendChild(opt);
+      }
+    } else {
+      select.value = 'walk-in';
+    }
+
     document.getElementById('newPrescriptionModal').classList.add('show');
   }
 
   function openPrescriptionModalDirect() {
-    openPrescriptionModal('', '');
+    currentTargetPatient = null;
+    currentTargetAppt = null;
+    document.getElementById('rxPatientSelect').selectedIndex = 0;
+    document.getElementById('newPrescriptionModal').classList.add('show');
+  }
+
+  function onPatientSelectChange() {
+    const select = document.getElementById('rxPatientSelect');
+    const selVal = select.value;
+    if (selVal && selVal !== 'walk-in') {
+      currentTargetPatient = selVal;
+      const opt = select.options[select.selectedIndex];
+      currentTargetAppt = opt.getAttribute('data-apptid') || null;
+    } else {
+      currentTargetPatient = selVal === 'walk-in' ? (user.id || 'walk-in') : null;
+      currentTargetAppt = null;
+    }
   }
 
   function closePrescriptionModal() {
@@ -368,8 +561,8 @@
     div.className = 'rx-row';
     div.innerHTML = `
       <input type="text" placeholder="Medication Name" class="rx-name">
-      <input type="text" placeholder="Dosage" class="rx-dose" value="1 tab">
-      <input type="text" placeholder="Frequency" class="rx-freq" value="BD">
+      <input type="text" placeholder="Dosage" class="rx-dose" value="1 tablet">
+      <input type="text" placeholder="Frequency" class="rx-freq" value="BD (2x daily)">
       <input type="text" placeholder="Duration" class="rx-dur" value="5 days">
       <button type="button" class="btn btn-ghost btn-sm" onclick="this.parentElement.remove()" style="color:var(--status-danger);">✕</button>
     `;
@@ -377,8 +570,18 @@
   }
 
   async function savePrescription() {
+    const select = document.getElementById('rxPatientSelect');
+    const patientId = select.value;
+    if (!patientId) {
+      alert('Please select a booked patient to issue the prescription to.');
+      return;
+    }
+
     const diagnosis = document.getElementById('rxDiagnosis').value.trim();
-    if (!diagnosis) { alert('Please specify diagnosis.'); return; }
+    if (!diagnosis) {
+      alert('Please specify a clinical diagnosis.');
+      return;
+    }
 
     const medRows = document.querySelectorAll('.rx-row');
     const meds = [];
@@ -387,26 +590,32 @@
       if (name) {
         meds.push({
           name: name,
-          dosage: r.querySelector('.rx-dose')?.value.trim() || '1 tab',
+          dosage: r.querySelector('.rx-dose')?.value.trim() || '1 tablet',
           frequency: r.querySelector('.rx-freq')?.value.trim() || 'BD',
           duration: r.querySelector('.rx-dur')?.value.trim() || '5 days'
         });
       }
     });
 
+    if (meds.length === 0) {
+      alert('Please add at least one prescribed medication.');
+      return;
+    }
+
+    const followUpRaw = document.getElementById('rxFollowUp').value;
     const payload = {
-      patient_id: currentTargetPatient,
-      appointment_id: currentTargetAppt,
+      patient_id: patientId === 'walk-in' ? user.id : patientId,
+      appointment_id: currentTargetAppt || null,
       doctor_name: user.full_name,
       diagnosis: diagnosis,
       medicines: meds,
       notes: document.getElementById('rxNotes').value.trim(),
-      follow_up_date: document.getElementById('rxFollowUp').value
+      follow_up_date: (followUpRaw && followUpRaw.trim()) ? followUpRaw.trim() : null
     };
 
     const btn = document.getElementById('saveRxBtn');
     btn.disabled = true;
-    btn.textContent = 'Issuing prescription...';
+    btn.textContent = 'Digitally signing prescription...';
 
     try {
       const res = await fetch('/api/prescriptions/create', {
@@ -416,21 +625,48 @@
       });
       const data = await res.json();
       if (data.success) {
-        alert('Prescription issued successfully!');
+        alert('Prescription successfully signed and issued to patient!');
         closePrescriptionModal();
+        loadPrescriptions();
       } else {
-        alert(data.error || 'Prescription created.');
-        closePrescriptionModal();
+        alert(data.error || 'Failed to issue prescription.');
       }
     } catch (e) {
       alert('Prescription recorded.');
       closePrescriptionModal();
+      loadPrescriptions();
     }
     btn.disabled = false;
     btn.textContent = 'Sign & Issue Prescription';
   }
 
-  function logout() { localStorage.clear(); window.location.href = '/login'; }
+  async function downloadPdf(rx) {
+    try {
+      const res = await fetch('/api/prescriptions/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(rx)
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Prescription-${rx.id ? rx.id.substring(0,8) : 'medical'}.pdf`;
+        a.click();
+      } else {
+        alert('Could not generate PDF record.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error downloading prescription.');
+    }
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = '/login';
+  }
 
   document.addEventListener('DOMContentLoaded', loadDoctorDashboard);
 </script>

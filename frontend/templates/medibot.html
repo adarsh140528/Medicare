@@ -168,8 +168,12 @@
 
   <script>
     const token = localStorage.getItem('medivision_token');
-    if (!token) window.location.href = '/login';
     const user = JSON.parse(localStorage.getItem('medivision_user') || '{}');
+    if (!token) {
+      window.location.href = '/login';
+    } else if (user.role === 'doctor') {
+      window.location.href = '/doctor-dashboard';
+    }
 
     function formatMarkdown(text) {
       if (!text) return '';
@@ -264,7 +268,34 @@
       sendMessage();
     }
 
-    function clearChat() {
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/ai/medibot/history', {
+          headers: { 'Authorization': 'Bearer ' + (token || '') }
+        });
+        const data = await res.json();
+        if (data.success && data.messages && data.messages.length > 0) {
+          const historyEl = document.getElementById('chatHistory');
+          historyEl.innerHTML = '';
+          data.messages.forEach(m => {
+            const role = (m.role === 'user') ? 'user' : 'bot';
+            addMessage(role, m.message || '');
+          });
+        }
+      } catch (e) {
+        console.error('Could not load chat history:', e);
+      }
+    }
+
+    async function clearChat() {
+      try {
+        await fetch('/api/ai/medibot/clear', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + (token || '') }
+        });
+      } catch (e) {
+        console.error('Could not clear history on server:', e);
+      }
       const history = document.getElementById('chatHistory');
       history.innerHTML = `
         <div class="msg-wrap bot">
@@ -275,6 +306,8 @@
         </div>
       `;
     }
+
+    document.addEventListener('DOMContentLoaded', loadHistory);
   </script>
 </body>
 </html>

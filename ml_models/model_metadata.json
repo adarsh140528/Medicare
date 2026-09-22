@@ -1,664 +1,671 @@
 {
   "symptoms": [
+    "abdominal cramps",
     "abdominal pain",
-    "acid coming back up throat",
-    "always feeling cold",
-    "anemia",
-    "ankle and feet swelling",
-    "appetite changes",
+    "acanthosis nigricans / dark neck skin",
+    "acid reflux",
     "bleeding gums",
-    "blistering skin",
-    "bloating",
     "blood in urine",
     "blurred vision",
-    "body aches",
-    "both hands or knees affected equally",
-    "breathlessness on exercise",
-    "burning feeling in chest after meals",
-    "burning while urinating",
-    "burping",
-    "chest discomfort",
-    "chest pain during exercise",
-    "chest pain when breathing",
+    "burning urination",
+    "chest pain",
     "chest tightness",
-    "chronic cough after eating",
-    "chronic dry cough worse at night",
-    "clear discharge",
-    "cloudy or smelly urine",
-    "cold hands and feet",
-    "cold sweats",
-    "confusion in elderly",
+    "chills",
+    "cloudy urine",
+    "cold extremities",
     "constipation",
-    "contact with covid patient",
-    "cough with yellow or green phlegm",
-    "crackling sound in chest",
-    "craving ice or dirt",
-    "darkened neck skin",
-    "dehydration",
-    "depression",
-    "difficulty breathing suddenly",
-    "difficulty swallowing",
+    "cough",
+    "difficulty breathing",
     "dizziness",
     "dry cough",
-    "dry flaky skin",
-    "dry skin",
-    "enlarged spleen",
-    "extreme thirst",
-    "extreme tiredness",
+    "excessive thirst",
+    "extreme fatigue",
+    "facial puffiness",
     "fatigue",
     "feeling hopeless",
     "fever",
-    "fever every 2 days",
-    "fever if infected",
-    "fever with rigor",
-    "food poisoning",
-    "frequent infections",
     "frequent urination",
+    "generalized weakness",
     "hair thinning",
     "headache",
-    "heartburn after eating",
-    "heavy periods",
+    "heartburn",
     "high blood pressure",
     "high fever",
     "hives",
-    "hoarse voice",
-    "inability to get out of bed",
-    "increased hunger",
-    "inflamed tongue",
-    "irregular heartbeats",
+    "increased appetite",
+    "insomnia",
     "itching",
-    "itchy red patches",
-    "joint deformity",
     "joint pain",
-    "light sensitivity",
+    "joint stiffness",
     "loss of appetite",
     "loss of smell",
     "loss of taste",
-    "low energy",
-    "low fever",
-    "low platelet count",
     "lower back pain",
-    "mild cough",
-    "mild fever",
-    "mild headache",
-    "mild sore throat",
-    "morning joint stiffness over 1 hour",
-    "multiple loose stools per day",
+    "morning joint stiffness",
     "muscle pain",
+    "nasal congestion",
     "nausea",
-    "nausea with headache",
-    "neck stiffness",
+    "nervousness and anxiety",
     "night sweats",
-    "nighttime breathlessness",
-    "no interest in activities you used to enjoy",
-    "nosebleed",
-    "one-sided pounding headache",
-    "pain behind eyes",
-    "pain in lower belly",
-    "pain radiating to groin area",
-    "pain spreading to left arm",
-    "pain while urinating",
-    "pale inner eyelids",
+    "one-sided throbbing headache",
     "pale skin",
-    "pelvic pain",
+    "palpitations",
+    "peripheral neuropathy / tingling",
     "persistent sadness",
-    "pink or red urine",
-    "poor concentration",
-    "positive covid test",
-    "pounding heartbeat",
-    "puffy face",
+    "productive cough",
+    "rapid heartbeat",
     "rapid shallow breathing",
-    "redness",
-    "reduced movement",
-    "ringing in ears",
+    "retro-orbital pain",
     "runny nose",
-    "seeing flashing lights",
+    "severe flank pain",
     "severe headache",
-    "severe muscle pain",
-    "severe pain in side and back",
-    "shaking chills",
-    "shivering",
     "shortness of breath",
-    "skin irritation",
-    "skin rash after fever",
-    "skin rash after touching something",
-    "sleep problems",
+    "skin rash",
+    "skin redness",
     "slow healing wounds",
-    "slow heartbeat",
     "sneezing",
     "sore throat",
-    "sound makes it worse",
-    "sour taste in mouth",
-    "spoon-shaped nails",
-    "stomach cramps",
-    "stone passed in urine",
-    "stuffy nose",
-    "sudden high fever",
-    "sudden vomiting",
-    "sweating heavily",
-    "swelling of lips or face",
-    "swollen finger joints",
-    "swollen neck",
-    "thoughts of suicide",
-    "throbbing headache at back of head",
-    "tightness in chest relieved by rest",
-    "tingling in feet",
-    "triggered by dust or cold air",
-    "unexplained weight gain despite diet",
+    "sweating",
+    "swollen joints",
+    "unexplained weight gain",
     "unexplained weight loss",
-    "urge to urinate but little comes out",
-    "very frequent urination",
-    "very high fever lasting 5 days",
-    "violent shaking chills",
     "vomiting",
-    "warm swollen joints",
     "watery diarrhea",
     "watery eyes",
-    "weakness",
-    "wheezing",
-    "withdrawing from friends",
-    "worse when lying down"
+    "wheezing"
   ],
+  "aliases": {
+    "cold": "runny nose",
+    "stuffy nose": "nasal congestion",
+    "blocked nose": "nasal congestion",
+    "sneezing": "sneezing",
+    "runny nose": "runny nose",
+    "watery eyes": "watery eyes",
+    "sore throat": "sore throat",
+    "throat pain": "sore throat",
+    "cough": "cough",
+    "dry cough": "dry cough",
+    "wet cough": "productive cough",
+    "phlegm": "productive cough",
+    "fever": "fever",
+    "high fever": "high fever",
+    "temperature": "fever",
+    "pyrexia": "fever",
+    "chills": "chills",
+    "shivering": "chills",
+    "sweating": "sweating",
+    "night sweats": "night sweats",
+    "headache": "headache",
+    "severe headache": "severe headache",
+    "migraine": "one-sided throbbing headache",
+    "head ache": "headache",
+    "body ache": "muscle pain",
+    "muscle pain": "muscle pain",
+    "myalgia": "muscle pain",
+    "joint pain": "joint pain",
+    "arthralgia": "joint pain",
+    "joint stiffness": "morning joint stiffness",
+    "stiff joints": "morning joint stiffness",
+    "swollen joints": "swollen joints",
+    "fatigue": "fatigue",
+    "tiredness": "fatigue",
+    "exhaustion": "extreme fatigue",
+    "weakness": "generalized weakness",
+    "dizziness": "dizziness",
+    "vertigo": "dizziness",
+    "lightheadedness": "dizziness",
+    "nausea": "nausea",
+    "feeling sick": "nausea",
+    "vomiting": "vomiting",
+    "puking": "vomiting",
+    "emesis": "vomiting",
+    "diarrhea": "watery diarrhea",
+    "loose motions": "watery diarrhea",
+    "loose stools": "watery diarrhea",
+    "stomach pain": "abdominal pain",
+    "abdominal pain": "abdominal pain",
+    "tummy ache": "abdominal pain",
+    "stomach cramps": "abdominal cramps",
+    "cramps": "abdominal cramps",
+    "heartburn": "heartburn",
+    "acid reflux": "acid reflux",
+    "indigestion": "acid reflux",
+    "acidity": "heartburn",
+    "chest pain": "chest pain",
+    "chest tightness": "chest tightness",
+    "chest pressure": "chest tightness",
+    "shortness of breath": "shortness of breath",
+    "breathlessness": "shortness of breath",
+    "difficulty breathing": "difficulty breathing",
+    "dyspnea": "shortness of breath",
+    "wheezing": "wheezing",
+    "rapid breathing": "rapid shallow breathing",
+    "palpitations": "palpitations",
+    "irregular heartbeat": "palpitations",
+    "rapid heartbeat": "rapid heartbeat",
+    "high blood pressure": "high blood pressure",
+    "hypertension": "high blood pressure",
+    "bp": "high blood pressure",
+    "frequent urination": "frequent urination",
+    "urinating often": "frequent urination",
+    "excessive thirst": "excessive thirst",
+    "increased hunger": "increased appetite",
+    "burning urination": "burning urination",
+    "painful urination": "burning urination",
+    "blood in urine": "blood in urine",
+    "cloudy urine": "cloudy urine",
+    "loss of smell": "loss of smell",
+    "anosmia": "loss of smell",
+    "loss of taste": "loss of taste",
+    "ageusia": "loss of taste",
+    "skin rash": "skin rash",
+    "rash": "skin rash",
+    "itching": "itching",
+    "pruritus": "itching",
+    "hives": "hives",
+    "urticaria": "hives",
+    "redness": "skin redness",
+    "pale skin": "pale skin",
+    "pallor": "pale skin",
+    "cold hands and feet": "cold extremities",
+    "weight loss": "unexplained weight loss",
+    "weight gain": "unexplained weight gain",
+    "constipation": "constipation",
+    "insomnia": "insomnia",
+    "sleep problems": "insomnia",
+    "depression": "persistent sadness",
+    "hopelessness": "feeling hopeless",
+    "anxiety": "nervousness and anxiety",
+    "back pain": "back pain",
+    "lower back pain": "lower back pain",
+    "flank pain": "severe flank pain",
+    "pain behind eyes": "retro-orbital pain",
+    "eye pain": "retro-orbital pain",
+    "bleeding gums": "bleeding gums",
+    "bruising": "easy bruising",
+    "swollen neck": "swollen neck lymph nodes",
+    "puffy face": "facial puffiness",
+    "hair loss": "hair thinning",
+    "hair thinning": "hair thinning",
+    "tingling in feet": "peripheral neuropathy / tingling",
+    "numbness": "peripheral neuropathy / tingling",
+    "slow healing wounds": "slow healing wounds",
+    "dark neck skin": "acanthosis nigricans / dark neck skin"
+  },
   "diseases": [
     "Common Cold",
-    "Influenza",
+    "Influenza (Flu)",
+    "COVID-19",
+    "Pneumonia",
+    "Bronchial Asthma",
+    "Hypertension (High BP)",
+    "Coronary Heart Disease",
+    "Type 2 Diabetes",
+    "Gastroenteritis (Stomach Flu)",
+    "GERD (Acid Reflux)",
+    "Migraine",
     "Dengue Fever",
     "Malaria",
-    "Type 2 Diabetes",
-    "Hypertension",
-    "Asthma",
-    "Pneumonia",
-    "Gastroenteritis",
-    "Migraine",
-    "Anemia",
-    "Thyroid Disorder",
-    "COVID-19",
-    "Urinary Tract Infection",
-    "Skin Allergy",
-    "Depression",
-    "Arthritis",
-    "Heart Disease",
-    "Kidney Stones",
-    "GERD"
+    "Urinary Tract Infection (UTI)",
+    "Kidney Stones (Renal Calculi)",
+    "Iron Deficiency Anemia",
+    "Hypothyroidism",
+    "Allergic Dermatitis / Hives",
+    "Rheumatoid Arthritis",
+    "Depressive Disorder"
   ],
   "disease_data": {
     "Common Cold": {
-      "key_symptoms": [
+      "hallmark_symptoms": [
         "runny nose",
         "sneezing",
-        "stuffy nose",
-        "watery eyes",
-        "clear discharge"
+        "nasal congestion",
+        "watery eyes"
       ],
-      "general_symptoms": [
-        "mild sore throat",
-        "mild cough",
-        "mild headache",
-        "low fever"
+      "support_symptoms": [
+        "sore throat",
+        "cough",
+        "headache",
+        "fever",
+        "fatigue"
       ],
-      "description": "A viral infection of the upper respiratory tract",
+      "description": "Mild acute viral infection of the upper respiratory tract caused by rhinoviruses.",
       "precautions": [
-        "Rest",
-        "Stay hydrated",
-        "Avoid cold drinks",
+        "Adequate hydration (warm fluids)",
+        "Saline nasal spray",
+        "Rest and sleep",
         "Steam inhalation"
       ],
       "severity": "mild"
     },
-    "Influenza": {
-      "key_symptoms": [
-        "sudden high fever",
-        "severe muscle pain",
-        "extreme tiredness",
-        "shivering",
-        "sweating heavily"
+    "Influenza (Flu)": {
+      "hallmark_symptoms": [
+        "high fever",
+        "chills",
+        "muscle pain",
+        "extreme fatigue",
+        "sweating"
       ],
-      "general_symptoms": [
+      "support_symptoms": [
         "dry cough",
         "sore throat",
         "headache",
+        "nasal congestion",
         "loss of appetite"
       ],
-      "description": "A contagious respiratory illness caused by influenza viruses",
+      "description": "Acute, contagious viral respiratory infection characterized by rapid onset of systemic symptoms.",
       "precautions": [
         "Bed rest",
-        "Antiviral medication",
-        "Flu vaccine",
-        "Isolation"
+        "Hydration and electrolyte balance",
+        "Antipyretics for fever",
+        "Isolation to prevent transmission"
       ],
       "severity": "moderate"
     },
-    "Dengue Fever": {
-      "key_symptoms": [
-        "pain behind eyes",
-        "skin rash after fever",
-        "low platelet count",
-        "bleeding gums",
-        "very high fever lasting 5 days"
+    "COVID-19": {
+      "hallmark_symptoms": [
+        "loss of smell",
+        "loss of taste",
+        "difficulty breathing",
+        "high fever"
       ],
-      "general_symptoms": [
-        "severe headache",
-        "joint pain",
-        "nausea",
-        "vomiting",
-        "fatigue"
-      ],
-      "description": "A mosquito-borne viral infection common in tropical regions",
-      "precautions": [
-        "Mosquito repellent",
-        "Hydration",
-        "Platelet monitoring",
-        "Hospital care if severe"
-      ],
-      "severity": "severe"
-    },
-    "Malaria": {
-      "key_symptoms": [
-        "fever every 2 days",
-        "violent shaking chills",
-        "enlarged spleen",
-        "night sweats",
-        "fever with rigor"
-      ],
-      "general_symptoms": [
-        "headache",
-        "nausea",
-        "vomiting",
+      "support_symptoms": [
+        "dry cough",
         "fatigue",
-        "anemia",
-        "muscle pain"
+        "muscle pain",
+        "sore throat",
+        "headache",
+        "chest tightness"
       ],
-      "description": "A life-threatening disease caused by Plasmodium parasites",
+      "description": "Infectious respiratory syndrome caused by SARS-CoV-2 coronavirus.",
       "precautions": [
-        "Antimalarial drugs",
-        "Mosquito nets",
-        "Blood test",
-        "Doctor consultation"
-      ],
-      "severity": "severe"
-    },
-    "Type 2 Diabetes": {
-      "key_symptoms": [
-        "very frequent urination",
-        "extreme thirst",
-        "tingling in feet",
-        "slow healing wounds",
-        "darkened neck skin"
-      ],
-      "general_symptoms": [
-        "blurred vision",
-        "frequent infections",
-        "unexplained weight loss",
-        "increased hunger",
-        "fatigue"
-      ],
-      "description": "A chronic condition affecting how your body metabolizes sugar",
-      "precautions": [
-        "Diet control",
-        "Exercise",
-        "Blood sugar monitoring",
-        "Medication"
-      ],
-      "severity": "chronic"
-    },
-    "Hypertension": {
-      "key_symptoms": [
-        "high blood pressure",
-        "throbbing headache at back of head",
-        "nosebleed",
-        "ringing in ears",
-        "pounding heartbeat"
-      ],
-      "general_symptoms": [
-        "dizziness",
-        "blurred vision",
-        "shortness of breath",
-        "chest discomfort",
-        "fatigue"
-      ],
-      "description": "High blood pressure that can lead to serious health complications",
-      "precautions": [
-        "Low salt diet",
-        "Exercise",
-        "Stress management",
-        "Medication"
-      ],
-      "severity": "chronic"
-    },
-    "Asthma": {
-      "key_symptoms": [
-        "wheezing",
-        "nighttime breathlessness",
-        "triggered by dust or cold air",
-        "chest tightness",
-        "chronic dry cough worse at night"
-      ],
-      "general_symptoms": [
-        "shortness of breath",
-        "breathlessness on exercise",
-        "fatigue"
-      ],
-      "description": "A condition causing airway inflammation and breathing difficulties",
-      "precautions": [
-        "Avoid triggers",
-        "Inhaler",
-        "Air purifier",
-        "Regular checkups"
+        "Self-isolation",
+        "SpO2 pulse oximetry monitoring",
+        "Hydration and rest",
+        "Seek emergency care if SpO2 < 94%"
       ],
       "severity": "moderate"
     },
     "Pneumonia": {
-      "key_symptoms": [
-        "cough with yellow or green phlegm",
-        "chest pain when breathing",
-        "shaking chills",
+      "hallmark_symptoms": [
+        "productive cough",
+        "chest pain",
         "rapid shallow breathing",
-        "crackling sound in chest"
+        "chills",
+        "high fever"
       ],
-      "general_symptoms": [
-        "high fever",
-        "fatigue",
+      "support_symptoms": [
         "shortness of breath",
-        "confusion in elderly",
-        "nausea"
+        "extreme fatigue",
+        "nausea",
+        "sweating",
+        "headache"
       ],
-      "description": "Infection causing inflammation in one or both lungs",
+      "description": "Inflammatory lung infection with alveolar exudation impairing gas exchange.",
       "precautions": [
-        "Antibiotics",
-        "Rest",
-        "Hydration",
-        "Hospital if severe"
+        "Immediate medical evaluation",
+        "Antibiotic / antiviral therapy as prescribed",
+        "Chest X-ray confirmation",
+        "SpO2 monitoring"
       ],
       "severity": "severe"
     },
-    "Gastroenteritis": {
-      "key_symptoms": [
-        "watery diarrhea",
-        "sudden vomiting",
-        "stomach cramps",
-        "food poisoning",
-        "multiple loose stools per day"
-      ],
-      "general_symptoms": [
-        "nausea",
-        "abdominal pain",
-        "dehydration",
-        "mild fever",
-        "loss of appetite"
-      ],
-      "description": "Inflammation of the digestive tract, often viral or bacterial",
-      "precautions": [
-        "ORS solution",
-        "Bland diet",
-        "Rest",
-        "Hygiene"
-      ],
-      "severity": "moderate"
-    },
-    "Migraine": {
-      "key_symptoms": [
-        "one-sided pounding headache",
-        "light sensitivity",
-        "seeing flashing lights",
-        "sound makes it worse",
-        "nausea with headache"
-      ],
-      "general_symptoms": [
-        "severe headache",
-        "vomiting",
-        "dizziness",
-        "neck stiffness"
-      ],
-      "description": "A neurological condition causing intense headaches",
-      "precautions": [
-        "Dark quiet room",
-        "Pain medication",
-        "Identify triggers",
-        "Stress reduction"
-      ],
-      "severity": "moderate"
-    },
-    "Anemia": {
-      "key_symptoms": [
-        "pale skin",
-        "pale inner eyelids",
-        "spoon-shaped nails",
-        "craving ice or dirt",
-        "inflamed tongue"
-      ],
-      "general_symptoms": [
-        "extreme tiredness",
-        "weakness",
-        "cold hands and feet",
+    "Bronchial Asthma": {
+      "hallmark_symptoms": [
+        "wheezing",
         "shortness of breath",
-        "dizziness"
+        "chest tightness",
+        "dry cough"
       ],
-      "description": "A condition where you lack enough red blood cells",
-      "precautions": [
-        "Iron-rich diet",
-        "Iron supplements",
-        "Vitamin B12",
-        "Treat underlying cause"
-      ],
-      "severity": "moderate"
-    },
-    "Thyroid Disorder": {
-      "key_symptoms": [
-        "always feeling cold",
-        "puffy face",
-        "slow heartbeat",
-        "hair thinning",
-        "unexplained weight gain despite diet"
-      ],
-      "general_symptoms": [
-        "constipation",
-        "dry skin",
-        "depression",
-        "heavy periods",
-        "swollen neck",
+      "support_symptoms": [
+        "difficulty breathing",
+        "rapid shallow breathing",
         "fatigue"
       ],
-      "description": "Conditions affecting thyroid gland function",
+      "description": "Chronic inflammatory disorder of the airways causing reversible bronchoconstriction.",
       "precautions": [
-        "Thyroid medication",
-        "Regular TSH tests",
-        "Iodine in diet",
-        "Avoid goitrogens"
+        "Use prescribed rescue inhaler (bronchodilator)",
+        "Avoid cold air and dust allergens",
+        "Peak flow monitoring",
+        "Keep emergency contact ready"
+      ],
+      "severity": "moderate"
+    },
+    "Hypertension (High BP)": {
+      "hallmark_symptoms": [
+        "high blood pressure",
+        "severe headache",
+        "dizziness",
+        "palpitations"
+      ],
+      "support_symptoms": [
+        "blurred vision",
+        "chest tightness",
+        "fatigue",
+        "shortness of breath"
+      ],
+      "description": "Chronic elevation of systemic arterial pressure exceeding 130/80 mmHg.",
+      "precautions": [
+        "Low-sodium DASH diet (<2g/day)",
+        "Daily blood pressure logs",
+        "Stress reduction and aerobic exercise",
+        "Regular physician review"
       ],
       "severity": "chronic"
     },
-    "COVID-19": {
-      "key_symptoms": [
-        "loss of smell",
-        "loss of taste",
-        "positive covid test",
-        "contact with covid patient",
-        "difficulty breathing suddenly"
+    "Coronary Heart Disease": {
+      "hallmark_symptoms": [
+        "chest pain",
+        "chest tightness",
+        "palpitations",
+        "rapid heartbeat"
       ],
-      "general_symptoms": [
-        "fever",
-        "dry cough",
+      "support_symptoms": [
+        "shortness of breath",
+        "dizziness",
+        "sweating",
         "fatigue",
-        "body aches",
-        "sore throat",
+        "nausea"
+      ],
+      "description": "Atherosclerotic narrowing of coronary arteries compromising myocardial perfusion.",
+      "precautions": [
+        "Immediate cardiology evaluation",
+        "ECG and cardiac enzyme testing",
+        "Low cholesterol Mediterranean diet",
+        "Prescribed anti-platelet therapy"
+      ],
+      "severity": "severe"
+    },
+    "Type 2 Diabetes": {
+      "hallmark_symptoms": [
+        "frequent urination",
+        "excessive thirst",
+        "increased appetite",
+        "peripheral neuropathy / tingling",
+        "slow healing wounds"
+      ],
+      "support_symptoms": [
+        "blurred vision",
+        "unexplained weight loss",
+        "fatigue",
+        "acanthosis nigricans / dark neck skin"
+      ],
+      "description": "Metabolic disorder characterized by insulin resistance and chronic hyperglycemia.",
+      "precautions": [
+        "Fasting and post-prandial glucose monitoring",
+        "Low glycemic index diet",
+        "Regular physical activity",
+        "HbA1c testing every 3 months"
+      ],
+      "severity": "chronic"
+    },
+    "Gastroenteritis (Stomach Flu)": {
+      "hallmark_symptoms": [
+        "watery diarrhea",
+        "vomiting",
+        "nausea",
+        "abdominal cramps",
+        "abdominal pain"
+      ],
+      "support_symptoms": [
+        "fever",
+        "generalized weakness",
+        "loss of appetite",
         "headache"
       ],
-      "description": "Coronavirus disease caused by SARS-CoV-2",
+      "description": "Acute inflammation of the gastrointestinal mucous membrane typically from viral/bacterial ingestion.",
       "precautions": [
-        "Isolation",
-        "Vaccination",
-        "Mask",
-        "Hydration",
-        "Doctor if severe"
+        "Oral Rehydration Salts (ORS)",
+        "Bland diet (BRAT: banana, rice, applesauce, toast)",
+        "Avoid dairy and caffeine",
+        "Maintain hand hygiene"
       ],
       "severity": "moderate"
     },
-    "Urinary Tract Infection": {
-      "key_symptoms": [
-        "burning while urinating",
-        "blood in urine",
-        "cloudy or smelly urine",
-        "urge to urinate but little comes out",
-        "pain in lower belly"
+    "GERD (Acid Reflux)": {
+      "hallmark_symptoms": [
+        "heartburn",
+        "acid reflux",
+        "chest pain"
       ],
-      "general_symptoms": [
-        "frequent urination",
-        "pelvic pain",
-        "lower back pain",
-        "mild fever"
+      "support_symptoms": [
+        "sore throat",
+        "dry cough",
+        "abdominal pain",
+        "nausea"
       ],
-      "description": "Infection in any part of the urinary system",
+      "description": "Retrograde flow of gastric acid into the esophagus causing mucosal irritation.",
       "precautions": [
-        "Antibiotics",
-        "Hydration",
-        "Cranberry juice",
-        "Hygiene"
-      ],
-      "severity": "moderate"
-    },
-    "Skin Allergy": {
-      "key_symptoms": [
-        "hives",
-        "itchy red patches",
-        "skin rash after touching something",
-        "swelling of lips or face",
-        "blistering skin"
-      ],
-      "general_symptoms": [
-        "itching",
-        "redness",
-        "dry flaky skin",
-        "skin irritation"
-      ],
-      "description": "Allergic reaction affecting the skin",
-      "precautions": [
-        "Avoid allergens",
-        "Antihistamines",
-        "Moisturizers",
-        "Cold compress"
+        "Avoid spicy and acidic foods",
+        "Elevate head of bed 15-20cm",
+        "Avoid lying down within 3 hours of meals",
+        "Smaller frequent meals"
       ],
       "severity": "mild"
     },
-    "Depression": {
-      "key_symptoms": [
-        "no interest in activities you used to enjoy",
-        "feeling hopeless",
-        "thoughts of suicide",
-        "inability to get out of bed",
-        "withdrawing from friends"
+    "Migraine": {
+      "hallmark_symptoms": [
+        "one-sided throbbing headache",
+        "severe headache",
+        "nausea",
+        "dizziness"
       ],
-      "general_symptoms": [
-        "persistent sadness",
-        "sleep problems",
-        "appetite changes",
-        "low energy",
-        "poor concentration"
+      "support_symptoms": [
+        "vomiting",
+        "fatigue",
+        "sore throat"
       ],
-      "description": "A mental health disorder affecting mood and quality of life",
+      "description": "Complex neurovascular disorder causing episodic moderate-to-severe throbbing head pain.",
       "precautions": [
-        "Therapy",
-        "Antidepressants",
-        "Exercise",
-        "Social support"
+        "Rest in a dark quiet room",
+        "Apply cold compress to forehead",
+        "Identify and avoid dietary triggers",
+        "Maintain consistent sleep schedule"
       ],
       "severity": "moderate"
     },
-    "Arthritis": {
-      "key_symptoms": [
-        "morning joint stiffness over 1 hour",
-        "swollen finger joints",
-        "joint deformity",
-        "both hands or knees affected equally",
-        "warm swollen joints"
+    "Dengue Fever": {
+      "hallmark_symptoms": [
+        "high fever",
+        "retro-orbital pain",
+        "skin rash",
+        "bleeding gums",
+        "muscle pain"
       ],
-      "general_symptoms": [
+      "support_symptoms": [
+        "severe headache",
         "joint pain",
-        "reduced movement",
-        "fatigue",
-        "weakness"
-      ],
-      "description": "Inflammation of one or more joints causing pain and stiffness",
-      "precautions": [
-        "Physical therapy",
-        "Anti-inflammatory drugs",
-        "Exercise",
-        "Weight management"
-      ],
-      "severity": "chronic"
-    },
-    "Heart Disease": {
-      "key_symptoms": [
-        "chest pain during exercise",
-        "pain spreading to left arm",
-        "tightness in chest relieved by rest",
-        "irregular heartbeats",
-        "ankle and feet swelling"
-      ],
-      "general_symptoms": [
-        "shortness of breath",
-        "dizziness",
-        "cold sweats",
         "nausea",
-        "fatigue"
+        "vomiting",
+        "extreme fatigue"
       ],
-      "description": "Range of conditions affecting heart structure and function",
+      "description": "Mosquito-borne flavivirus infection causing severe acute febrile illness and thrombocytopenia.",
       "precautions": [
-        "Medication",
-        "Diet changes",
-        "Exercise",
-        "No smoking",
-        "Regular checkups"
+        "Complete blood count (CBC) to monitor platelet counts",
+        "Aggressive oral hydration",
+        "Avoid NSAIDs like aspirin/ibuprofen (use Paracetamol)",
+        "Mosquito bite prevention"
       ],
       "severity": "severe"
     },
-    "Kidney Stones": {
-      "key_symptoms": [
-        "severe pain in side and back",
-        "pain radiating to groin area",
-        "pink or red urine",
-        "pain while urinating",
-        "stone passed in urine"
+    "Malaria": {
+      "hallmark_symptoms": [
+        "fever",
+        "chills",
+        "sweating",
+        "night sweats",
+        "headache"
       ],
-      "general_symptoms": [
+      "support_symptoms": [
+        "nausea",
+        "vomiting",
+        "muscle pain",
+        "extreme fatigue",
+        "generalized weakness"
+      ],
+      "description": "Protozoan parasitic infection transmitted by Anopheles mosquitoes.",
+      "precautions": [
+        "Immediate diagnostic blood smear / rapid antigen test",
+        "Complete prescribed antimalarial course",
+        "Use insecticide-treated bed nets",
+        "Adequate fluid replenishment"
+      ],
+      "severity": "severe"
+    },
+    "Urinary Tract Infection (UTI)": {
+      "hallmark_symptoms": [
+        "burning urination",
+        "frequent urination",
+        "cloudy urine",
+        "blood in urine"
+      ],
+      "support_symptoms": [
+        "lower back pain",
+        "abdominal pain",
+        "fever",
+        "chills"
+      ],
+      "description": "Bacterial colonization of the urinary tract mucosa (urethritis / cystitis / pyelonephritis).",
+      "precautions": [
+        "Increase daily water intake to >3 Liters",
+        "Urine culture and antibiotic sensitivity test",
+        "Avoid bladder irritants (caffeine, alcohol)",
+        "Maintain strict urogenital hygiene"
+      ],
+      "severity": "moderate"
+    },
+    "Kidney Stones (Renal Calculi)": {
+      "hallmark_symptoms": [
+        "severe flank pain",
+        "blood in urine",
+        "burning urination",
+        "lower back pain"
+      ],
+      "support_symptoms": [
         "nausea",
         "vomiting",
         "frequent urination",
-        "fever if infected"
+        "fever"
       ],
-      "description": "Hard deposits of minerals forming in the kidneys",
+      "description": "Mineral crystalline aggregations forming within renal calyces causing urinary tract obstruction.",
       "precautions": [
-        "Hydration",
-        "Low sodium diet",
-        "Pain management",
-        "Medical procedure if large"
+        "High fluid intake (3-4L/day)",
+        "Ultrasonography / CT KUB imaging",
+        "Pain management with physician consultation",
+        "Dietary calcium and oxalate moderation"
       ],
       "severity": "severe"
     },
-    "GERD": {
-      "key_symptoms": [
-        "heartburn after eating",
-        "acid coming back up throat",
-        "sour taste in mouth",
-        "burning feeling in chest after meals",
-        "worse when lying down"
+    "Iron Deficiency Anemia": {
+      "hallmark_symptoms": [
+        "pale skin",
+        "extreme fatigue",
+        "generalized weakness",
+        "cold extremities",
+        "dizziness"
       ],
-      "general_symptoms": [
-        "difficulty swallowing",
-        "hoarse voice",
-        "chronic cough after eating",
-        "bloating",
-        "burping"
+      "support_symptoms": [
+        "shortness of breath",
+        "headache",
+        "palpitations"
       ],
-      "description": "Gastroesophageal reflux disease causing stomach acid to flow back",
+      "description": "Depletion of iron stores leading to impaired hemoglobin synthesis and tissue hypoxia.",
       "precautions": [
-        "Avoid trigger foods",
-        "Elevate head",
-        "Antacids",
-        "Small meals"
+        "Iron-rich foods (spinach, lentils, lean meats, beans)",
+        "Vitamin C to enhance iron absorption",
+        "CBC and serum ferritin evaluation",
+        "Iron supplementation as prescribed"
+      ],
+      "severity": "moderate"
+    },
+    "Hypothyroidism": {
+      "hallmark_symptoms": [
+        "unexplained weight gain",
+        "extreme fatigue",
+        "cold extremities",
+        "facial puffiness",
+        "hair thinning"
+      ],
+      "support_symptoms": [
+        "constipation",
+        "muscle pain",
+        "joint stiffness",
+        "persistent sadness"
+      ],
+      "description": "Underactive thyroid gland with insufficient thyroxine synthesis slowing metabolic rate.",
+      "precautions": [
+        "Serum TSH, Free T3, and Free T4 blood test",
+        "Levothyroxine thyroid hormone replacement",
+        "Iodized salt and balanced nutrition",
+        "Routine endocrinologist monitoring"
+      ],
+      "severity": "chronic"
+    },
+    "Allergic Dermatitis / Hives": {
+      "hallmark_symptoms": [
+        "skin rash",
+        "itching",
+        "hives",
+        "skin redness"
+      ],
+      "support_symptoms": [
+        "swollen joints",
+        "facial puffiness",
+        "dry cough"
+      ],
+      "description": "Cutaneous hypersensitivity reaction triggering localized or widespread histamine release.",
+      "precautions": [
+        "Identify and eliminate triggering allergens",
+        "Oral antihistamines for symptom relief",
+        "Cool colloidal oatmeal baths or cold compresses",
+        "Avoid scratching to prevent secondary infection"
+      ],
+      "severity": "mild"
+    },
+    "Rheumatoid Arthritis": {
+      "hallmark_symptoms": [
+        "morning joint stiffness",
+        "swollen joints",
+        "joint pain",
+        "muscle pain"
+      ],
+      "support_symptoms": [
+        "generalized weakness",
+        "fatigue",
+        "fever"
+      ],
+      "description": "Systemic autoimmune disease causing chronic symmetric synovial inflammation and cartilage damage.",
+      "precautions": [
+        "Rheumatology consultation and autoimmune markers (RF, Anti-CCP)",
+        "Gentle range-of-motion physical therapy",
+        "Anti-inflammatory and DMARD therapy",
+        "Joint warm compresses"
+      ],
+      "severity": "chronic"
+    },
+    "Depressive Disorder": {
+      "hallmark_symptoms": [
+        "persistent sadness",
+        "feeling hopeless",
+        "insomnia",
+        "extreme fatigue"
+      ],
+      "support_symptoms": [
+        "unexplained weight loss",
+        "loss of appetite",
+        "nervousness and anxiety",
+        "generalized weakness"
+      ],
+      "description": "Clinical mood disorder marked by pervasive emotional distress, anhedonia, and vegetative symptoms.",
+      "precautions": [
+        "Clinical psychology / psychiatric evaluation",
+        "Cognitive Behavioral Therapy (CBT)",
+        "Structured daily routine and aerobic exercise",
+        "Reach out to trusted support network or mental health helpline"
       ],
       "severity": "moderate"
     }
   },
-  "accuracy": 1.0,
-  "model_type": "VotingEnsemble_v4"
+  "accuracy": 0.9358333333333333,
+  "model_version": "5.0-ensemble-clinical"
 }

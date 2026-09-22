@@ -147,7 +147,12 @@
 
 <script>
   const token = localStorage.getItem('medivision_token');
-  if (!token) window.location.href = '/login';
+  const user = JSON.parse(localStorage.getItem('medivision_user') || '{}');
+  if (!token) {
+    window.location.href = '/login';
+  } else if (user.role === 'doctor') {
+    window.location.href = '/doctor-dashboard';
+  }
 
   async function loadPrescriptions() {
     try {

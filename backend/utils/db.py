@@ -155,7 +155,8 @@ def init_db():
             weight REAL,
             height REAL,
             bmi REAL,
-            recorded_at TEXT
+            recorded_at TEXT,
+            created_at TEXT
         )
         ''')
 
@@ -209,6 +210,12 @@ def init_db():
             created_at TEXT
         )
         ''')
+
+        # Auto-migration for existing databases
+        try:
+            cursor.execute("ALTER TABLE vitals ADD COLUMN created_at TEXT")
+        except Exception:
+            pass
 
         conn.commit()
 
@@ -272,6 +279,20 @@ class SQLiteTableQuery:
     def ilike(self, column, pattern):
         self.where_clauses.append(f"{column} LIKE ?")
         self.params.append(pattern)
+        return self
+
+    def in_(self, column, values):
+        if not values:
+            self.where_clauses.append("1=0")
+        else:
+            placeholders = ', '.join(['?'] * len(values))
+            self.where_clauses.append(f"{column} IN ({placeholders})")
+            self.params.extend(values)
+        return self
+
+    def neq(self, column, value):
+        self.where_clauses.append(f"{column} != ?")
+        self.params.append(value)
         return self
 
     def order(self, column, desc=False):

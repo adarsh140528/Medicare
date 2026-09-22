@@ -86,11 +86,10 @@
       <div class="step-bar done" id="s1"></div>
       <div class="step-bar" id="s2"></div>
       <div class="step-bar" id="s3"></div>
-      <div class="step-bar" id="s4"></div>
     </div>
 
     <div class="step-indicator" id="stepLabel">
-      <span>Step 1 of 4</span>
+      <span>Step 1 of 3</span>
       <span style="color: var(--accent-primary);">Account Info</span>
     </div>
 
@@ -110,33 +109,33 @@
 
       <div class="form-group">
         <label class="form-label" for="r_email">Email Address *</label>
-        <input type="email" id="r_email" placeholder="arjun@example.com" required>
+        <input type="email" id="r_email" placeholder="name@example.com" required>
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="r_phone">Mobile Number *</label>
+        <label class="form-label" for="r_phone">Phone Number *</label>
         <input type="tel" id="r_phone" placeholder="+91 98765 43210" required>
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="r_password">Account Password *</label>
-        <input type="password" id="r_password" placeholder="Minimum 8 characters" required>
+        <label class="form-label" for="r_password">Password *</label>
+        <input type="password" id="r_password" placeholder="Min. 8 characters" required>
       </div>
 
-      <button type="button" class="btn btn-primary btn-lg" onclick="goStep2()" style="width: 100%; margin-top: 6px;">
-        Continue to Medical Details →
+      <button type="button" class="btn btn-primary btn-lg" onclick="goStep2()" style="width: 100%; margin-top: 10px;">
+        Continue to Health Profile →
       </button>
 
       <div style="margin-top: 20px; text-align: center; font-size: 13px; color: var(--text-muted);">
-        Already have an account? <a href="/login" style="font-weight: 600;">Sign in</a>
+        Already registered? <a href="/login" style="font-weight: 600;">Sign in here</a>
       </div>
     </div>
 
-    <!-- STEP 2: Medical & Demographics -->
+    <!-- STEP 2: Medical Baseline -->
     <div class="form-section" id="step2">
       <div style="margin-bottom: 20px;">
-        <h3 style="margin-bottom: 4px;">Health & Clinical Profile</h3>
-        <p style="font-size: 13px; color: var(--text-secondary);">Used for personalizing vital parameters and assessment</p>
+        <h3 style="margin-bottom: 4px;">Health Information</h3>
+        <p style="font-size: 13px; color: var(--text-secondary);">Baseline medical telemetry (optional, improves clinical accuracy)</p>
       </div>
 
       <div class="form-grid-2">
@@ -146,11 +145,11 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="r_gender">Biological Sex *</label>
-          <select id="r_gender">
-            <option value="">Select</option>
+          <select id="r_gender" required>
+            <option value="">Select...</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Other">Other</option>
+            <option value="Other">Other / Non-binary</option>
           </select>
         </div>
       </div>
@@ -159,7 +158,7 @@
         <div class="form-group">
           <label class="form-label" for="r_blood">Blood Group</label>
           <select id="r_blood">
-            <option value="">Unknown / Pending</option>
+            <option value="">Unknown</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -210,37 +209,12 @@
       </div>
     </div>
 
-    <!-- STEP 3: OTP Verification -->
-    <div class="form-section" id="step3">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h3 style="margin-bottom: 4px;">Verify Contact Number</h3>
-        <p id="otpMsg" style="font-size: 13px; color: var(--text-secondary);">Enter the 6-digit code sent to your registered phone.</p>
-      </div>
-
-      <div class="otp-container">
-        <input class="otp-box otp-input" maxlength="1" type="text" inputmode="numeric" aria-label="Digit 1">
-        <input class="otp-box otp-input" maxlength="1" type="text" inputmode="numeric" aria-label="Digit 2">
-        <input class="otp-box otp-input" maxlength="1" type="text" inputmode="numeric" aria-label="Digit 3">
-        <input class="otp-box otp-input" maxlength="1" type="text" inputmode="numeric" aria-label="Digit 4">
-        <input class="otp-box otp-input" maxlength="1" type="text" inputmode="numeric" aria-label="Digit 5">
-        <input class="otp-box otp-input" maxlength="1" type="text" inputmode="numeric" aria-label="Digit 6">
-      </div>
-
-      <button type="button" class="btn btn-primary btn-lg" onclick="verifyRegOTP()" id="verifyBtn" style="width: 100%; margin-top: 10px;">
-        Verify & Finalize Account
-      </button>
-
-      <div style="margin-top: 18px; text-align: center; font-size: 13px; color: var(--text-muted);">
-        Didn't receive? <button type="button" class="resend-btn" onclick="resendOTP()">Resend Code</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: Registration Complete -->
-    <div class="form-section" id="step4" style="text-align: center; padding: 24px 0;">
+    <!-- STEP 3: Registration Complete -->
+    <div class="form-section" id="step3" style="text-align: center; padding: 24px 0;">
       <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--status-success-bg); color: var(--status-success); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px;">
         ✓
       </div>
-      <h3 style="margin-bottom: 6px;">Profile Verified & Active</h3>
+      <h3 style="margin-bottom: 6px;">Profile Created & Active</h3>
       <p style="font-size: 13.5px; color: var(--text-secondary); max-width: 400px; margin: 0 auto 28px;">
         Your patient record has been provisioned and your authenticated session is active.
       </p>
@@ -251,8 +225,6 @@
   </div>
 
   <script>
-    let pendingUserId = null;
-
     function goStep1() { setStep(1); }
 
     function goStep2() {
@@ -269,10 +241,12 @@
 
     function setStep(n) {
       document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-      document.getElementById('step' + n).classList.add('active');
+      const target = document.getElementById('step' + n);
+      if (target) target.classList.add('active');
       document.querySelectorAll('.step-bar').forEach((s, i) => s.classList.toggle('done', i < n));
-      const labels = ['', 'Account Info', 'Health Details', 'Phone Verification', 'Complete'];
-      document.getElementById('stepLabel').innerHTML = '<span>Step ' + n + ' of 4</span> <span style="color:var(--accent-primary);">' + labels[n] + '</span>';
+      const labels = ['', 'Account Info', 'Health Details', 'Complete'];
+      const lblEl = document.getElementById('stepLabel');
+      if (lblEl) lblEl.innerHTML = '<span>Step ' + n + ' of 3</span> <span style="color:var(--accent-primary);">' + (labels[n] || '') + '</span>';
       clearAlert();
     }
 
@@ -309,98 +283,21 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        if (data.success) {
-          pendingUserId = data.user_id;
-          document.getElementById('otpMsg').textContent = data.message || 'Verification code sent to your mobile device.';
-          if (data.demo_otp) {
-            const boxes = document.querySelectorAll('.otp-input');
-            data.demo_otp.split('').forEach((ch, i) => {
-              if (boxes[i]) {
-                boxes[i].value = ch;
-                boxes[i].classList.add('filled');
-              }
-            });
-          }
+        if (data.success && data.token) {
+          localStorage.setItem('medivision_token', data.token);
+          localStorage.setItem('medivision_user', JSON.stringify(data.user));
           setStep(3);
         } else {
           showAlert('error', data.error || 'Registration failed. Please check your data.');
+          btn.disabled = false;
+          btn.textContent = 'Create Patient Profile →';
         }
       } catch (e) {
         showAlert('error', 'Connection error. Make sure the server is reachable.');
+        btn.disabled = false;
+        btn.textContent = 'Create Patient Profile →';
       }
-
-      btn.disabled = false;
-      btn.textContent = 'Create Patient Profile →';
     }
-
-    async function verifyRegOTP() {
-      const otp = Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
-      if (otp.length !== 6) { showAlert('error', 'Enter the full 6-digit verification code'); return; }
-
-      const btn = document.getElementById('verifyBtn');
-      btn.disabled = true;
-      btn.textContent = 'Verifying...';
-
-      try {
-        const res = await fetch('/api/auth/login/otp/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ otp, user_id: pendingUserId })
-        });
-        const data = await res.json();
-        if (data.success) {
-          localStorage.setItem('medivision_token', data.token);
-          localStorage.setItem('medivision_user', JSON.stringify(data.user));
-          setStep(4);
-        } else {
-          showAlert('error', data.error || 'Invalid verification code.');
-          document.querySelectorAll('.otp-input').forEach(i => i.value = '');
-          document.querySelectorAll('.otp-input')[0].focus();
-        }
-      } catch (e) {
-        showAlert('error', 'Verification service error. Please try again.');
-      }
-
-      btn.disabled = false;
-      btn.textContent = 'Verify & Finalize Account';
-    }
-
-    async function resendOTP() {
-      if (!pendingUserId) { showAlert('error', 'Session expired. Please restart enrollment.'); return; }
-      try {
-        const res = await fetch('/api/auth/otp/resend', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: pendingUserId })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showAlert('info', data.message || 'New code sent.');
-          if (data.demo_otp) {
-            const boxes = document.querySelectorAll('.otp-input');
-            data.demo_otp.split('').forEach((ch, i) => {
-              if (boxes[i]) {
-                boxes[i].value = ch;
-                boxes[i].classList.add('filled');
-              }
-            });
-          }
-        } else { showAlert('error', data.error || 'Could not resend code.'); }
-      } catch (e) { showAlert('error', 'Connection error.'); }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.otp-input').forEach((input, idx, arr) => {
-        input.addEventListener('input', () => {
-          input.value = input.value.replace(/\D/g, '');
-          input.classList.toggle('filled', input.value !== '');
-          if (input.value && idx < arr.length - 1) arr[idx + 1].focus();
-        });
-        input.addEventListener('keydown', e => {
-          if (e.key === 'Backspace' && !input.value && idx > 0) arr[idx - 1].focus();
-        });
-      });
-    });
 
     function showAlert(type, msg) {
       const b = document.getElementById('alertBox');

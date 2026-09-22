@@ -62,7 +62,7 @@
 | **Consultation Scheduling** | `/appointments` | Flask + Payment Gateway | Doctor directory filtered by specialty with interactive calendar slot reservations. |
 | **Prescription Records** | `/prescriptions` | `ReportLab` PDF Engine | Formal digital medical prescription issuance and instant PDF export downloads. |
 | **Clinical Health Summary** | `/health-report` | Printable Clinical Layout | Print-ready comprehensive medical profile, domain scores, and longitudinal logs. |
-| **2FA Authentication** | `/login`, `/register` | `Twilio` SMS + JWT | Segmented Patient/Doctor role switcher with 6-digit auto-advancing OTP verification. |
+| **Direct Authentication** | `/login`, `/register` | Direct JWT Tokens | Segmented Patient/Doctor role switcher with immediate authenticated portal access. |
 
 ---
 
@@ -81,7 +81,7 @@ Medicare-1/
 │
 ├── backend/
 │   ├── routes/
-│   │   ├── auth_routes.py          # Twilio OTP, JWT token generation & login/register
+│   │   ├── auth_routes.py          # Direct JWT token generation & login/register
 │   │   ├── ai_routes.py            # Disease prediction ML endpoint & chat routing
 │   │   ├── appointment_routes.py   # Scheduling, slot availability & doctor catalog
 │   │   ├── dashboard_routes.py     # Patient overview, stats aggregation & vitals logs
@@ -101,9 +101,9 @@ Medicare-1/
 │   │   └── theme.js                # Zero-flicker theme engine with persistence & mobile nav
 │   └── templates/
 │       ├── landing.html            # Marketing landing page
-│       ├── login.html              # Authentication & 6-box OTP card
-│       ├── register.html           # 4-stage enrollment wizard
-│       ├── dashboard.html          # Patient health dashboard
+│       ├── login.html              # Direct Authentication portal
+│       ├── register.html           # 3-stage enrollment wizard
+│       ├── dashboard.html          # Patient health dashboard with live vitals telemetry
 │       ├── doctor_dashboard.html   # Physician clinical workspace
 │       ├── appointments.html       # Doctor directory & appointment booking
 │       ├── prescriptions.html      # Prescription history & PDF generation
@@ -221,11 +221,12 @@ python ml_models/train_model.py
 ---
 
 ## 🛡️ Security & Clinical Compliance
-- **Authentication**: Role-based JWT access tokens + Twilio OTP 2FA.
-- **Data Protection**: Supabase Row-Level Security (RLS) enforcement.
+- **Authentication**: Role-based direct HMAC-SHA256 JWT access tokens with instant session authorization.
+- **Data Protection**: Supabase Row-Level Security (RLS) enforcement with localized database fallback.
 - **Medical Safety**: Built-in automated clinical disclaimers and acute emergency red flag triage on all assessments.
 
 ---
 
 ## 📄 License
 Released under the **MIT License**.
+

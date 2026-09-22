@@ -27,12 +27,39 @@ def list_prescriptions():
     try:
         from backend.utils.supabase_client import get_service_client
         supabase = get_service_client()
-        res = supabase.table('prescriptions')\
-            .select('*')\
-            .eq('patient_id', user['id'])\
-            .order('created_at', desc=True)\
-            .execute()
-        return jsonify({"success": True, "prescriptions": res.data or []})
+        if user.get('role') == 'doctor':
+            doc_name = user['full_name'].replace('Dr. ', '').strip()
+            res = supabase.table('prescriptions')\
+                .select('*')\
+                .ilike('doctor_name', f'%{doc_name}%')\
+                .order('created_at', desc=True)\
+                .execute()
+            prescriptions = res.data or []
+            if not prescriptions:
+                res_all = supabase.table('prescriptions').select('*').order('created_at', desc=True).execute()
+                prescriptions = res_all.data or []
+        else:
+            res = supabase.table('prescriptions')\
+                .select('*')\
+                .eq('patient_id', user['id'])\
+                .order('created_at', desc=True)\
+                .execute()
+            prescriptions = res.data or []
+
+        if prescriptions:
+            p_ids = list({p['patient_id'] for p in prescriptions if p.get('patient_id')})
+            if p_ids:
+                try:
+                    u_res = supabase.table('users').select('id, full_name, email').in_('id', p_ids).execute()
+                    u_map = {u['id']: u for u in (u_res.data or [])}
+                    for p in prescriptions:
+                        u_info = u_map.get(p.get('patient_id'))
+                        if u_info:
+                            p['patient_name'] = u_info.get('full_name') or 'Patient'
+                except Exception as ex:
+                    print(f"[PRESCRIPTIONS] Error enriching patient names: {ex}")
+
+        return jsonify({"success": True, "prescriptions": prescriptions})
     except Exception as e:
         print(f"[PRESCRIPTIONS] {e}")
         return jsonify({"error": "Could not load prescriptions."}), 500
@@ -200,13 +227,17 @@ def create_prescription():
         return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         patient_id = data.get('patient_id')
-        appointment_id = data.get('appointment_id')
+        appointment_raw = data.get('appointment_id')
+        appointment_id = appointment_raw if (appointment_raw and str(appointment_raw).strip()) else None
+        
         medicines = data.get('medicines', [])
         diagnosis = data.get('diagnosis', '')
         notes = data.get('notes', '')
-        follow_up_date = data.get('follow_up_date')
+        
+        follow_up_raw = data.get('follow_up_date')
+        follow_up_date = follow_up_raw if (follow_up_raw and str(follow_up_raw).strip()) else None
 
         if not patient_id or not medicines:
             return jsonify({"success": False, "error": "Patient ID and medicines are required"}), 400

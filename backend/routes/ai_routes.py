@@ -41,9 +41,9 @@ def get_model():
 
 @ai_bp.route('/predict', methods=['POST'])
 def predict_disease():
-    """Predict diseases from symptoms"""
+    """Predict diseases from symptoms and persist to Supabase/DB"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         symptoms = data.get('symptoms', [])
         user_profile = data.get('user_profile', {})
         
@@ -66,26 +66,51 @@ def predict_disease():
         result['recommendations'] = get_health_recommendations(health_score, user_profile)
         result['timestamp'] = datetime.utcnow().isoformat()
         
-        # Save prediction to DB (must use service client — anon key blocked by RLS)
-        try:
-            from backend.utils.supabase_client import get_service_client
-            supabase = get_service_client()
-            user_id = data.get('user_id')
-            if user_id:
+        # Resolve user ID from JWT header or payload
+        from backend.routes.auth_routes import get_current_user
+        from backend.utils.supabase_client import get_service_client
+        
+        auth_user = get_current_user()
+        user_id = data.get('user_id') or (auth_user['id'] if auth_user else None)
+        
+        if user_id:
+            try:
+                supabase = get_service_client()
+                top_disease_name = result['predictions'][0]['disease'] if result['predictions'] else 'General Assessment'
+                confidence_val = (result['predictions'][0]['probability'] / 100.0) if result['predictions'] else 0.5
+
+                # 1. Save prediction record
                 supabase.table('disease_predictions').insert({
                     'user_id': user_id,
                     'symptoms': symptoms,
                     'predictions': result['predictions'],
-                    'top_disease': result['predictions'][0]['disease'] if result['predictions'] else None,
-                    'confidence': result['predictions'][0]['probability'] / 100 if result['predictions'] else None,
-                    'health_risk_score': result['health_risk_score']
+                    'top_disease': top_disease_name,
+                    'confidence': confidence_val,
+                    'health_risk_score': result.get('health_risk_score', 30),
+                    'recommendations': result.get('recommendations', [])
                 }).execute()
-        except:
-            pass
+
+                # 2. Update user health score in users table
+                supabase.table('users').update({
+                    'health_score': health_score
+                }).eq('id', user_id).execute()
+
+                # 3. Add clinical notification
+                supabase.table('notifications').insert({
+                    'user_id': user_id,
+                    'title': 'AI Symptom Assessment Completed',
+                    'message': f'Differential assessment completed. Top indication: {top_disease_name}. Health score: {health_score}/100.',
+                    'type': 'clinical_alert',
+                    'is_read': False
+                }).execute()
+
+            except Exception as db_e:
+                print(f"[PREDICTION-SAVE-ERROR] {db_e}")
         
         return jsonify({"success": True, "result": result})
         
     except Exception as e:
+        print(f"[PREDICT ERROR] {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -103,7 +128,7 @@ def get_symptoms():
 def health_score_endpoint():
     """Compute AI health score"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         from ml_models.train_model import compute_health_score as ml_score
         score = ml_score(data)
         
@@ -165,7 +190,7 @@ You can help with:
 
 @ai_bp.route('/medibot/chat', methods=['POST'])
 def medibot_chat():
-    """Clinical AI Assistant chat endpoint"""
+    """Clinical AI Assistant chat endpoint with database persistence in Supabase/SQLite"""
     try:
         data = request.get_json() or {}
         message = data.get('message', '').strip()
@@ -174,8 +199,45 @@ def medibot_chat():
         if not message:
             return jsonify({"error": "Message required"}), 400
         
+        from backend.routes.auth_routes import get_current_user
+        from backend.utils.supabase_client import get_service_client
+        
+        auth_user = get_current_user()
+        user_id = data.get('user_id') or (auth_user['id'] if auth_user else None)
+        supabase = get_service_client()
+
+        # If history wasn't provided by client, load recent messages from DB
+        if not history and user_id:
+            try:
+                res = supabase.table('chat_history').select('*').eq('user_id', user_id).order('created_at', desc=True).limit(8).execute()
+                db_msgs = res.data or []
+                db_msgs.reverse()
+                history = [{"role": m.get('role', 'user'), "content": m.get('message', '')} for m in db_msgs]
+            except Exception as he:
+                print(f"[CHAT-HISTORY-LOAD] {he}")
+        
         from backend.services.ai_bot_service import generate_clinical_response
         bot_response = generate_clinical_response(message, history)
+
+        # Store both user message and assistant reply to chat_history table in Supabase/DB
+        if user_id:
+            try:
+                supabase.table('chat_history').insert([
+                    {
+                        'user_id': user_id,
+                        'role': 'user',
+                        'message': message,
+                        'created_at': datetime.utcnow().isoformat()
+                    },
+                    {
+                        'user_id': user_id,
+                        'role': 'assistant',
+                        'message': bot_response,
+                        'created_at': datetime.utcnow().isoformat()
+                    }
+                ]).execute()
+            except Exception as se:
+                print(f"[CHAT-HISTORY-SAVE] {se}")
         
         return jsonify({
             "success": True,
@@ -186,6 +248,45 @@ def medibot_chat():
     except Exception as e:
         print(f"[MEDIBOT ERROR] {e}")
         return jsonify({"error": "An error occurred while generating clinical response."}), 500
+
+
+@ai_bp.route('/medibot/history', methods=['GET'])
+def get_chat_history():
+    """Retrieve persistent conversation history for authenticated user"""
+    from backend.routes.auth_routes import get_current_user
+    from backend.utils.supabase_client import get_service_client
+    
+    auth_user = get_current_user()
+    if not auth_user:
+        return jsonify({"success": True, "messages": []})
+    
+    try:
+        supabase = get_service_client()
+        res = supabase.table('chat_history').select('*').eq('user_id', auth_user['id']).order('created_at', desc=False).limit(50).execute()
+        messages = res.data or []
+        return jsonify({"success": True, "messages": messages})
+    except Exception as e:
+        print(f"[CHAT-HISTORY-FETCH] {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@ai_bp.route('/medibot/clear', methods=['POST'])
+def clear_chat_history():
+    """Clear chat conversation history for authenticated user"""
+    from backend.routes.auth_routes import get_current_user
+    from backend.utils.supabase_client import get_service_client
+    
+    auth_user = get_current_user()
+    if not auth_user:
+        return jsonify({"success": True, "message": "Cleared session"})
+    
+    try:
+        supabase = get_service_client()
+        supabase.table('chat_history').delete().eq('user_id', auth_user['id']).execute()
+        return jsonify({"success": True, "message": "Chat history cleared successfully."})
+    except Exception as e:
+        print(f"[CHAT-HISTORY-CLEAR] {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 

@@ -292,30 +292,42 @@
           </div>
         </div>
 
+        <!-- Vitals Header & Quick Action -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;letter-spacing:0.5px;">Live Biometric Telemetry</div>
+            <div id="vitalsLastUpdated" style="font-size:11.5px;color:var(--text-muted);">Awaiting baseline vitals</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showVitalsModal()" style="display:inline-flex;align-items:center;gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            + Record Vitals
+          </button>
+        </div>
+
         <!-- Vitals Mini Matrix -->
         <div class="vitals-summary-grid">
           <div class="stat-card">
-            <div class="stat-label">Heart Rate (Pulse)</div>
-            <div class="stat-value" id="vitalHR">72 <span class="stat-unit">BPM</span></div>
-            <div class="stat-footer" id="vitalHRStatus"><span class="badge badge-success"><span class="badge-dot"></span> Normal Resting</span></div>
+            <div class="stat-label">Heart Rate (Pulse) <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <div class="stat-value" id="vitalHR">-- <span class="stat-unit">BPM</span></div>
+            <div class="stat-footer" id="vitalHRStatus"><span class="badge badge-neutral"><span class="badge-dot"></span> Pending Log</span></div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Blood Pressure</div>
-            <div class="stat-value" id="vitalBP">120/80 <span class="stat-unit">mmHg</span></div>
-            <div class="stat-footer" id="vitalBPStatus"><span class="badge badge-success"><span class="badge-dot"></span> Optimal</span></div>
+            <div class="stat-label">Blood Pressure <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="stat-value" id="vitalBP">--/-- <span class="stat-unit">mmHg</span></div>
+            <div class="stat-footer" id="vitalBPStatus"><span class="badge badge-neutral"><span class="badge-dot"></span> Pending Log</span></div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Oxygen Saturation</div>
-            <div class="stat-value" id="vitalSPO2">98 <span class="stat-unit">%</span></div>
-            <div class="stat-footer" id="vitalSPO2Status"><span class="badge badge-success"><span class="badge-dot"></span> Optimal SpO2</span></div>
+            <div class="stat-label">Oxygen Saturation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+            <div class="stat-value" id="vitalSPO2">-- <span class="stat-unit">%</span></div>
+            <div class="stat-footer" id="vitalSPO2Status"><span class="badge badge-neutral"><span class="badge-dot"></span> Pending Log</span></div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Patient Weight</div>
-            <div class="stat-value" id="vitalWeight">70 <span class="stat-unit">kg</span></div>
-            <div class="stat-footer" id="vitalWeightStatus"><span class="badge badge-neutral"><span class="badge-dot"></span> Recorded</span></div>
+            <div class="stat-label">Patient Weight <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></div>
+            <div class="stat-value" id="vitalWeight">-- <span class="stat-unit">kg</span></div>
+            <div class="stat-footer" id="vitalWeightStatus"><span class="badge badge-neutral"><span class="badge-dot"></span> Pending Log</span></div>
           </div>
         </div>
 
@@ -327,7 +339,10 @@
                 <div class="card-title">Weekly Vitals Log</div>
                 <div class="card-desc">Chronological record of physiological telemetry</div>
               </div>
-              <button class="btn btn-secondary btn-sm" onclick="showPage('vitals')">Full Log →</button>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-secondary btn-sm" onclick="showVitalsModal()">+ Log Reading</button>
+                <button class="btn btn-ghost btn-sm" onclick="showPage('vitals')">Full History →</button>
+              </div>
             </div>
             <div class="table-container">
               <table class="clinical-table" id="weeklyVitalsTable">
@@ -336,11 +351,12 @@
                     <th>Record Date</th>
                     <th>Heart Rate</th>
                     <th>Blood Pressure</th>
-                    <th>Oxygen</th>
+                    <th>Oxygen (SpO2)</th>
+                    <th>Weight</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted);">Retrieving telemetry records...</td></tr>
+                  <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">Retrieving telemetry records...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -349,7 +365,7 @@
           <!-- Health Score Gauge -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Clinical Index</div>
+              <div class="card-title">Clinical Index & Vitals Balance</div>
             </div>
             <div class="gauge-wrap">
               <div class="gauge-container">
@@ -366,18 +382,18 @@
             <div style="margin-top: 14px;">
               <div class="metric-progress-row">
                 <span>Cardiovascular Index</span>
-                <div class="progress-track"><div class="progress-fill" style="width:85%;"></div></div>
-                <span class="mono" style="font-size:11px;">85%</span>
+                <div class="progress-track"><div class="progress-fill" id="cardioProgress" style="width:85%;"></div></div>
+                <span class="mono" id="cardioScore" style="font-size:11px;font-weight:600;min-width:32px;text-align:right;">85%</span>
               </div>
               <div class="metric-progress-row">
                 <span>Respiratory Parameter</span>
-                <div class="progress-track"><div class="progress-fill" style="width:90%;"></div></div>
-                <span class="mono" style="font-size:11px;">90%</span>
+                <div class="progress-track"><div class="progress-fill" id="respiratoryProgress" style="width:90%;"></div></div>
+                <span class="mono" id="respiratoryScore" style="font-size:11px;font-weight:600;min-width:32px;text-align:right;">90%</span>
               </div>
               <div class="metric-progress-row">
                 <span>Fatigue & Ocular Index</span>
-                <div class="progress-track"><div class="progress-fill" style="width:78%;"></div></div>
-                <span class="mono" style="font-size:11px;">78%</span>
+                <div class="progress-track"><div class="progress-fill" id="fatigueProgress" style="width:78%;"></div></div>
+                <span class="mono" id="fatigueScore" style="font-size:11px;font-weight:600;min-width:32px;text-align:right;">78%</span>
               </div>
             </div>
           </div>
@@ -681,6 +697,81 @@
   </div>
 </div>
 
+<!-- ============================================================
+     RECORD VITALS MODAL
+     ============================================================ -->
+<div class="modal-backdrop" id="vitalsModal">
+  <div class="modal-card" style="max-width: 500px;">
+    <div class="modal-header">
+      <div class="modal-title">Record Clinical Telemetry</div>
+      <button class="modal-close" onclick="closeVitalsModal()">✕</button>
+    </div>
+    <form id="vitalsForm" onsubmit="submitVitals(event)">
+      <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">
+        Input your real physiological biometric measurements to update clinical indices and real-time monitoring baselines.
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inputHR">Heart Rate (Pulse)</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="inputHR" placeholder="72" min="30" max="240" required style="font-family:var(--font-mono);">
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600;min-width:30px;">BPM</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inputSPO2">Oxygen (SpO2)</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="inputSPO2" placeholder="98" min="50" max="100" required style="font-family:var(--font-mono);">
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600;min-width:30px;">%</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inputBPSys">BP Systolic (Upper)</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="inputBPSys" placeholder="120" min="60" max="250" required style="font-family:var(--font-mono);">
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600;min-width:30px;">mmHg</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inputBPDia">BP Diastolic (Lower)</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="inputBPDia" placeholder="80" min="40" max="160" required style="font-family:var(--font-mono);">
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600;min-width:30px;">mmHg</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inputWeight">Weight</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" step="0.1" id="inputWeight" placeholder="70.0" min="20" max="300" style="font-family:var(--font-mono);">
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600;min-width:30px;">kg</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="inputTemp">Temperature</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" step="0.1" id="inputTemp" placeholder="98.6" min="30" max="110" style="font-family:var(--font-mono);">
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600;min-width:30px;">°F</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="vitalsErrorMsg" style="display:none;font-size:12.5px;color:var(--accent-danger);margin-bottom:12px;padding:8px 12px;background:rgba(239,68,68,0.1);border-radius:var(--radius-sm);"></div>
+
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button type="button" class="btn btn-secondary btn-lg" onclick="closeVitalsModal()" style="flex:0.4;">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-lg" id="saveVitalsBtn" style="flex:1;">Save Vitals Log</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
   // ── Authentication Verification ──
   const token = localStorage.getItem('medivision_token');
@@ -688,6 +779,8 @@
 
   if (!token) {
     window.location.href = '/login';
+  } else if (user.role === 'doctor') {
+    window.location.href = '/doctor-dashboard';
   }
 
   // ── Page / Tab Routing ──
@@ -719,6 +812,113 @@
     if (pageName === 'predict') loadSymptoms();
   }
 
+  // ── Vitals Modal Handling ──
+  function showVitalsModal() {
+    const modal = document.getElementById('vitalsModal');
+    if (modal) modal.classList.add('show');
+    const err = document.getElementById('vitalsErrorMsg');
+    if (err) err.style.display = 'none';
+  }
+
+  function closeVitalsModal() {
+    const modal = document.getElementById('vitalsModal');
+    if (modal) modal.classList.remove('show');
+  }
+
+  async function submitVitals(e) {
+    e.preventDefault();
+    const btn = document.getElementById('saveVitalsBtn');
+    const errEl = document.getElementById('vitalsErrorMsg');
+    btn.disabled = true;
+    btn.textContent = 'Saving Telemetry...';
+    if (errEl) errEl.style.display = 'none';
+
+    const hr = document.getElementById('inputHR').value;
+    const spo2 = document.getElementById('inputSPO2').value;
+    const bpSys = document.getElementById('inputBPSys').value;
+    const bpDia = document.getElementById('inputBPDia').value;
+    const weight = document.getElementById('inputWeight').value;
+    const temp = document.getElementById('inputTemp').value;
+
+    try {
+      const res = await fetch('/api/dashboard/vitals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          heart_rate: hr,
+          oxygen_saturation: spo2,
+          bp_systolic: bpSys,
+          bp_diastolic: bpDia,
+          weight: weight || null,
+          temperature: temp || null
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        closeVitalsModal();
+        document.getElementById('vitalsForm').reset();
+        await loadDashboard();
+        const vitalsPage = document.getElementById('page-vitals');
+        if (vitalsPage && vitalsPage.classList.contains('active')) {
+          await loadFullVitals();
+        }
+      } else {
+        if (errEl) {
+          errEl.textContent = data.error || 'Failed to save vitals.';
+          errEl.style.display = 'block';
+        }
+      }
+    } catch (err) {
+      if (errEl) {
+        errEl.textContent = 'Network or server error while saving vitals.';
+        errEl.style.display = 'block';
+      }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save Vitals Log';
+    }
+  }
+
+  // ── Load Full Vitals Tab ──
+  async function loadFullVitals() {
+    const tbody = document.getElementById('fullVitalsTableBody');
+    if (!tbody) return;
+    try {
+      const res = await fetch('/api/dashboard/overview', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const json = await res.json();
+      if (json.success && json.data && json.data.vitals_history) {
+        const history = json.data.vitals_history;
+        if (history.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--text-muted);">No vitals records logged yet. Click <strong>+ Record New Vitals</strong> above to log your first telemetry.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = history.map(v => {
+          const dt = v.recorded_at ? new Date(v.recorded_at).toLocaleString() : (v.created_at ? new Date(v.created_at).toLocaleString() : 'Recent');
+          const hrBadge = v.heart_rate ? (v.heart_rate >= 60 && v.heart_rate <= 100 ? 'badge-success' : 'badge-warning') : 'badge-neutral';
+          const spo2Badge = v.oxygen_saturation ? (v.oxygen_saturation >= 95 ? 'badge-success' : (v.oxygen_saturation >= 90 ? 'badge-warning' : 'badge-danger')) : 'badge-neutral';
+          return `
+            <tr>
+              <td class="mono" style="font-size:12.5px;">${dt}</td>
+              <td><span class="badge ${hrBadge}" style="font-family:var(--font-mono);">${v.heart_rate ? v.heart_rate + ' BPM' : '—'}</span></td>
+              <td class="mono">${v.blood_pressure_sys ? v.blood_pressure_sys + ' mmHg' : '—'}</td>
+              <td class="mono">${v.blood_pressure_dia ? v.blood_pressure_dia + ' mmHg' : '—'}</td>
+              <td><span class="badge ${spo2Badge}" style="font-family:var(--font-mono);">${v.oxygen_saturation ? v.oxygen_saturation + '%' : '—'}</span></td>
+              <td class="mono">${v.weight ? v.weight + ' kg' : '—'}</td>
+              <td class="mono">${v.temperature ? v.temperature + ' °F' : '—'}</td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No records found.</td></tr>';
+      }
+    } catch (e) {
+      console.error('Error loading full vitals:', e);
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--accent-danger);">Error retrieving vitals history.</td></tr>';
+    }
+  }
+
   // ── Load Dashboard Overview ──
   async function loadDashboard() {
     if (user.full_name) {
@@ -733,11 +933,35 @@
       const json = await res.json();
       if (json.success && json.data) {
         const d = json.data;
+        const ev = d.vitals_evaluation || {};
+        const score = (d.user && d.user.health_score) || ev.computed_health_score || 75;
+
         if (d.user) {
           document.getElementById('userName').textContent = d.user.full_name || 'Patient';
-          document.getElementById('topScore').textContent = d.user.health_score || 75;
-          document.getElementById('scoreNum').textContent = d.user.health_score || 75;
+          document.getElementById('topScore').textContent = score;
+          document.getElementById('scoreNum').textContent = score;
         }
+
+        // Circular Gauge & Sub-Indices
+        const circle = document.getElementById('scoreCircle');
+        if (circle) {
+          const circumference = 351.8;
+          const offset = circumference - (score / 100) * circumference;
+          circle.style.strokeDashoffset = offset;
+          circle.style.stroke = score >= 80 ? 'var(--accent-primary)' : (score >= 60 ? '#f59e0b' : '#ef4444');
+        }
+
+        // Sub-index bars
+        const cardio = ev.cardio_index !== undefined ? ev.cardio_index : 85;
+        const resp = ev.respiratory_param !== undefined ? ev.respiratory_param : 90;
+        const fatigue = ev.fatigue_ocular_index !== undefined ? ev.fatigue_ocular_index : 82;
+
+        if (document.getElementById('cardioProgress')) document.getElementById('cardioProgress').style.width = cardio + '%';
+        if (document.getElementById('cardioScore')) document.getElementById('cardioScore').textContent = cardio + '%';
+        if (document.getElementById('respiratoryProgress')) document.getElementById('respiratoryProgress').style.width = resp + '%';
+        if (document.getElementById('respiratoryScore')) document.getElementById('respiratoryScore').textContent = resp + '%';
+        if (document.getElementById('fatigueProgress')) document.getElementById('fatigueProgress').style.width = fatigue + '%';
+        if (document.getElementById('fatigueScore')) document.getElementById('fatigueScore').textContent = fatigue + '%';
 
         if (d.stats) {
           document.getElementById('statTotalAppts').textContent = d.stats.total_appointments || 0;
@@ -747,23 +971,65 @@
           document.getElementById('notifCount').textContent = d.stats.alerts || 0;
         }
 
-        // Vitals history
-        if (d.vitals_history && d.vitals_history.length > 0) {
-          const latest = d.vitals_history[0];
-          if (latest.heart_rate) document.getElementById('vitalHR').innerHTML = `${latest.heart_rate} <span class="stat-unit">BPM</span>`;
-          if (latest.blood_pressure_sys) document.getElementById('vitalBP').innerHTML = `${latest.blood_pressure_sys}/${latest.blood_pressure_dia || 80} <span class="stat-unit">mmHg</span>`;
-          if (latest.oxygen_saturation) document.getElementById('vitalSPO2').innerHTML = `${latest.oxygen_saturation} <span class="stat-unit">%</span>`;
-          if (latest.weight) document.getElementById('vitalWeight').innerHTML = `${latest.weight} <span class="stat-unit">kg</span>`;
+        // Live Vitals Mini-Matrix
+        if (ev.has_vitals && ev.summary) {
+          const s = ev.summary;
+          const updatedEl = document.getElementById('vitalsLastUpdated');
+          if (updatedEl) updatedEl.textContent = `Last reading: ${s.recorded_at_human}`;
+          
+          document.getElementById('vitalHR').innerHTML = s.heart_rate !== null ? `${s.heart_rate} <span class="stat-unit">BPM</span>` : `-- <span class="stat-unit">BPM</span>`;
+          document.getElementById('vitalHRStatus').innerHTML = `<span class="badge ${s.hr_status.badge}"><span class="badge-dot"></span> ${s.hr_status.text}</span>`;
 
-          const tbody = document.querySelector('#weeklyVitalsTable tbody');
-          tbody.innerHTML = d.vitals_history.slice(0, 5).map(v => `
-            <tr>
-              <td class="mono">${new Date(v.recorded_at || Date.now()).toLocaleDateString()}</td>
-              <td class="mono">${v.heart_rate || '—'} BPM</td>
-              <td class="mono">${v.blood_pressure_sys || '—'}/${v.blood_pressure_dia || '—'}</td>
-              <td class="mono">${v.oxygen_saturation || '—'}%</td>
-            </tr>
-          `).join('');
+          const bpText = s.bp_sys !== null ? `${s.bp_sys}/${s.bp_dia || 80}` : `--/--`;
+          document.getElementById('vitalBP').innerHTML = `${bpText} <span class="stat-unit">mmHg</span>`;
+          document.getElementById('vitalBPStatus').innerHTML = `<span class="badge ${s.bp_status.badge}"><span class="badge-dot"></span> ${s.bp_status.text}</span>`;
+
+          document.getElementById('vitalSPO2').innerHTML = s.oxygen_saturation !== null ? `${s.oxygen_saturation} <span class="stat-unit">%</span>` : `-- <span class="stat-unit">%</span>`;
+          document.getElementById('vitalSPO2Status').innerHTML = `<span class="badge ${s.spo2_status.badge}"><span class="badge-dot"></span> ${s.spo2_status.text}</span>`;
+
+          document.getElementById('vitalWeight').innerHTML = s.weight !== null ? `${s.weight} <span class="stat-unit">kg</span>` : `-- <span class="stat-unit">kg</span>`;
+          document.getElementById('vitalWeightStatus').innerHTML = `<span class="badge ${s.weight_status.badge}"><span class="badge-dot"></span> ${s.weight_status.text}</span>`;
+        } else {
+          const updatedEl = document.getElementById('vitalsLastUpdated');
+          if (updatedEl) updatedEl.textContent = 'No vitals logged yet — click + Record Vitals';
+          document.getElementById('vitalHR').innerHTML = `-- <span class="stat-unit">BPM</span>`;
+          document.getElementById('vitalHRStatus').innerHTML = `<span class="badge badge-neutral"><span class="badge-dot"></span> No Record</span>`;
+          document.getElementById('vitalBP').innerHTML = `--/-- <span class="stat-unit">mmHg</span>`;
+          document.getElementById('vitalBPStatus').innerHTML = `<span class="badge badge-neutral"><span class="badge-dot"></span> No Record</span>`;
+          document.getElementById('vitalSPO2').innerHTML = `-- <span class="stat-unit">%</span>`;
+          document.getElementById('vitalSPO2Status').innerHTML = `<span class="badge badge-neutral"><span class="badge-dot"></span> No Record</span>`;
+          document.getElementById('vitalWeight').innerHTML = `-- <span class="stat-unit">kg</span>`;
+          document.getElementById('vitalWeightStatus').innerHTML = `<span class="badge badge-neutral"><span class="badge-dot"></span> No Record</span>`;
+        }
+
+        // Weekly Vitals table
+        const tbody = document.querySelector('#weeklyVitalsTable tbody');
+        if (tbody) {
+          if (d.vitals_history && d.vitals_history.length > 0) {
+            tbody.innerHTML = d.vitals_history.slice(0, 5).map(v => {
+              const dt = v.recorded_at ? new Date(v.recorded_at).toLocaleDateString() : (v.created_at ? new Date(v.created_at).toLocaleDateString() : 'Recent');
+              return `
+                <tr>
+                  <td class="mono" style="font-size:12.5px;">${dt}</td>
+                  <td class="mono">${v.heart_rate ? `<strong>${v.heart_rate}</strong> BPM` : '—'}</td>
+                  <td class="mono">${v.blood_pressure_sys ? `<strong>${v.blood_pressure_sys}/${v.blood_pressure_dia || 80}</strong> mmHg` : '—'}</td>
+                  <td class="mono">${v.oxygen_saturation ? `<strong>${v.oxygen_saturation}%</strong>` : '—'}</td>
+                  <td class="mono">${v.weight ? `${v.weight} kg` : (v.temperature ? `${v.temperature}°F` : '—')}</td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">
+                  No physiological records logged yet.
+                  <div style="margin-top:8px;">
+                    <button class="btn btn-secondary btn-sm" onclick="showVitalsModal()">+ Record Baseline Vitals</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }
         }
 
         // Appointments

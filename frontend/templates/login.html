@@ -131,7 +131,7 @@
         <span>Signing in as <strong>Medical Professional</strong></span>
       </div>
 
-      <!-- STEP 1: Email & Password -->
+      <!-- Direct Email & Password Login -->
       <div id="panelPassword" class="panel show">
         <div class="form-group">
           <label class="form-label" for="inEmail">Email Address</label>
@@ -147,42 +147,11 @@
         </div>
 
         <button class="btn btn-primary btn-lg" id="loginBtn" onclick="doLogin()" style="width: 100%; margin-top: 8px;">
-          Continue with Password →
+          Sign In →
         </button>
 
         <div style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-muted);">
           New to MediVision? <a href="/register" style="font-weight: 600;">Create Account</a>
-        </div>
-      </div>
-
-      <!-- STEP 2: OTP Verification -->
-      <div id="panelOtp" class="panel">
-        <div style="text-align: center; margin-bottom: 18px;">
-          <h3 style="margin-bottom: 4px;">Two-Factor Verification</h3>
-          <p id="otpHint" style="font-size: 13px; color: var(--text-secondary);">Enter the 6-digit code sent to your device.</p>
-        </div>
-
-        <div class="otp-container" id="otpRow">
-          <input class="otp-box otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 1">
-          <input class="otp-box otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 2">
-          <input class="otp-box otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 3">
-          <input class="otp-box otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 4">
-          <input class="otp-box otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 5">
-          <input class="otp-box otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 6">
-        </div>
-
-        <div class="otp-timer">Code expires in <span id="timerDisplay" style="color: var(--text-primary); font-weight: 600;">10:00</span></div>
-
-        <button class="btn btn-primary btn-lg" id="verifyBtn" onclick="doVerifyOtp()" style="width: 100%;">
-          Verify & Sign In
-        </button>
-
-        <div style="margin-top: 18px; text-align: center; font-size: 13px; color: var(--text-muted);">
-          Didn't receive a code? <button class="resend-btn" id="resendBtn" onclick="doResend()">Resend Code</button>
-        </div>
-
-        <div style="margin-top: 14px; text-align: center;">
-          <button onclick="goBack()" class="btn btn-ghost btn-sm">← Back to credentials</button>
         </div>
       </div>
     </div>
@@ -195,10 +164,14 @@
         </div>
         <h3 style="margin-bottom: 12px;">Enterprise Clinical Security</h3>
         <p style="font-size: 13px; line-height: 1.6; margin-bottom: 24px;">
-          Every session is fortified with 2-factor verification, HMAC-SHA256 authenticated JWT tokens, and encrypted audit logging.
+          Direct, encrypted authentication powered by HMAC-SHA256 authenticated JWT tokens and automated role authorization.
         </p>
 
         <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span style="color: var(--status-success); font-size: 14px; margin-top: 1px;">✓</span>
+            <div style="font-size: 12.5px; color: var(--text-secondary);">Direct credential verification with instantaneous portal access</div>
+          </div>
           <div style="display: flex; align-items: flex-start; gap: 12px;">
             <span style="color: var(--status-success); font-size: 14px; margin-top: 1px;">✓</span>
             <div style="font-size: 12.5px; color: var(--text-secondary);">Role-based isolation between clinical staff and patients</div>
@@ -206,10 +179,6 @@
           <div style="display: flex; align-items: flex-start; gap: 12px;">
             <span style="color: var(--status-success); font-size: 14px; margin-top: 1px;">✓</span>
             <div style="font-size: 12.5px; color: var(--text-secondary);">End-to-end telemetry and prescription verification</div>
-          </div>
-          <div style="display: flex; align-items: flex-start; gap: 12px;">
-            <span style="color: var(--status-success); font-size: 14px; margin-top: 1px;">✓</span>
-            <div style="font-size: 12.5px; color: var(--text-secondary);">Zero credential sharing & tamper-proof audit trail</div>
           </div>
         </div>
       </div>
@@ -231,39 +200,6 @@
   </div>
 
   <script>
-    let pendingUserId = null;
-    let timerInterval = null;
-    let timerSeconds = 600;
-    const digits = () => document.querySelectorAll('.otp-digit');
-
-    // Auto-advance OTP input boxes
-    document.addEventListener('DOMContentLoaded', () => {
-      digits().forEach((inp, i, all) => {
-        inp.addEventListener('input', e => {
-          inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
-          inp.classList.toggle('filled', inp.value !== '');
-          if (inp.value && i < all.length - 1) all[i + 1].focus();
-          if (getOtp().length === 6) doVerifyOtp();
-        });
-        inp.addEventListener('keydown', e => {
-          if (e.key === 'Backspace' && !inp.value && i > 0) all[i - 1].focus();
-        });
-        inp.addEventListener('paste', e => {
-          e.preventDefault();
-          const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
-          all.forEach((box, idx) => {
-            box.value = text[idx] || '';
-            box.classList.toggle('filled', box.value !== '');
-          });
-          if (text.length === 6) doVerifyOtp();
-        });
-      });
-    });
-
-    function getOtp() {
-      return Array.from(digits()).map(d => d.value).join('');
-    }
-
     let currentRole = 'patient';
     function setRole(role) {
       currentRole = role;
@@ -283,7 +219,7 @@
       const password = document.getElementById('inPassword').value;
       if (!email || !password) { showAlert('error', 'Please enter your email and password.'); return; }
 
-      setBtn('loginBtn', true, 'Verifying credentials...');
+      setBtn('loginBtn', true, 'Signing in...');
       clearAlert();
 
       try {
@@ -294,127 +230,21 @@
         });
         const data = await res.json();
 
-        if (data.success) {
-          pendingUserId = data.user_id;
-          showPanel('otp');
-          startTimer();
-
-          const hint = document.getElementById('otpHint');
-          if (data.demo_otp) {
-            hint.innerHTML = `Verification Code: <strong style="font-family:var(--font-mono);">${data.demo_otp}</strong>`;
-            fillOtp(data.demo_otp);
-          } else {
-            hint.textContent = `Verification code sent to ****${data.phone_hint || ''}`;
-          }
+        if (data.success && data.token) {
+          localStorage.setItem('medivision_token', data.token);
+          localStorage.setItem('medivision_user', JSON.stringify(data.user));
+          showAlert('success', 'Sign in successful! Redirecting to portal...');
+          setTimeout(() => {
+            window.location.href = data.user.role === 'doctor' ? '/doctor-dashboard' : '/dashboard';
+          }, 600);
         } else {
           showAlert('error', data.error || 'Login failed. Please verify your credentials.');
+          setBtn('loginBtn', false, 'Sign In →');
         }
       } catch (e) {
         showAlert('error', 'Connection error. Please ensure the server is active.');
+        setBtn('loginBtn', false, 'Sign In →');
       }
-
-      setBtn('loginBtn', false, 'Continue with Password →');
-    }
-
-    async function doVerifyOtp() {
-      const otp = getOtp();
-      if (otp.length < 6) { showAlert('error', 'Please enter all 6 digits.'); return; }
-
-      setBtn('verifyBtn', true, 'Verifying code...');
-      clearAlert();
-
-      try {
-        const res = await fetch('/api/auth/login/otp/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ otp, user_id: pendingUserId })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          localStorage.setItem('medivision_token', data.token);
-          localStorage.setItem('medivision_user', JSON.stringify(data.user));
-          showAlert('success', 'Authentication successful. Redirecting...');
-          clearInterval(timerInterval);
-          setTimeout(() => {
-            window.location.href = data.user.role === 'doctor' ? '/doctor-dashboard' : '/dashboard';
-          }, 800);
-        } else {
-          showAlert('error', data.error || 'Invalid verification code.');
-          digits().forEach(d => { d.value = ''; d.classList.remove('filled'); });
-          digits()[0].focus();
-        }
-      } catch (e) {
-        showAlert('error', 'Verification request failed. Please try again.');
-      }
-
-      setBtn('verifyBtn', false, 'Verify & Sign In');
-    }
-
-    async function doResend() {
-      const btn = document.getElementById('resendBtn');
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-
-      try {
-        const res = await fetch('/api/auth/otp/resend', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: pendingUserId })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showAlert('info', data.message || 'New verification code dispatched.');
-          if (data.demo_otp) fillOtp(data.demo_otp);
-          timerSeconds = 600;
-          startTimer();
-        } else {
-          showAlert('error', data.error || 'Could not resend verification code.');
-        }
-      } catch (e) {
-        showAlert('error', 'Connection error.');
-      }
-
-      setTimeout(() => { btn.disabled = false; btn.textContent = 'Resend Code'; }, 30000);
-      btn.textContent = 'Resend in 30s';
-    }
-
-    function startTimer() {
-      clearInterval(timerInterval);
-      timerSeconds = 600;
-      timerInterval = setInterval(() => {
-        timerSeconds--;
-        const m = Math.floor(timerSeconds / 60);
-        const s = timerSeconds % 60;
-        document.getElementById('timerDisplay').textContent = `${m}:${s.toString().padStart(2, '0')}`;
-        if (timerSeconds <= 0) {
-          clearInterval(timerInterval);
-          document.getElementById('timerDisplay').textContent = 'Expired';
-        }
-      }, 1000);
-    }
-
-    function showPanel(name) {
-      document.getElementById('panelPassword').classList.remove('show');
-      document.getElementById('panelOtp').classList.remove('show');
-      document.getElementById(`panel${name.charAt(0).toUpperCase() + name.slice(1)}`).classList.add('show');
-      clearAlert();
-    }
-
-    function goBack() {
-      clearInterval(timerInterval);
-      digits().forEach(d => { d.value = ''; d.classList.remove('filled'); });
-      showPanel('password');
-    }
-
-    function fillOtp(otp) {
-      const all = digits();
-      otp.split('').forEach((ch, i) => {
-        if (all[i]) {
-          all[i].value = ch;
-          all[i].classList.add('filled');
-        }
-      });
     }
 
     function showAlert(type, msg) {
@@ -433,8 +263,10 @@
 
     function setBtn(id, disabled, label) {
       const btn = document.getElementById(id);
-      btn.disabled = disabled;
-      btn.textContent = label;
+      if (btn) {
+        btn.disabled = disabled;
+        btn.textContent = label;
+      }
     }
   </script>
 </body>

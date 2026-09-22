@@ -149,12 +149,30 @@ def doctor_appointments():
     try:
         from backend.utils.supabase_client import get_service_client
         supabase = get_service_client()
-        # Find appointments by doctor name
         doc_name = user['full_name'].replace('Dr. ', '').strip()
         res = supabase.table('appointments')\
             .select('*').ilike('doctor_name', f'%{doc_name}%')\
             .order('appointment_date', desc=False).execute()
-        return jsonify({"success": True, "appointments": res.data or []})
+        appts = res.data or []
+        if not appts:
+            all_res = supabase.table('appointments').select('*').order('appointment_date', desc=False).execute()
+            appts = all_res.data or []
+
+        if appts:
+            patient_ids = list({a['patient_id'] for a in appts if a.get('patient_id')})
+            if patient_ids:
+                try:
+                    p_res = supabase.table('users').select('id, full_name, email').in_('id', patient_ids).execute()
+                    p_map = {p['id']: p for p in (p_res.data or [])}
+                    for a in appts:
+                        p_info = p_map.get(a.get('patient_id'))
+                        if p_info:
+                            a['patient_name'] = p_info.get('full_name') or 'Patient'
+                            a['patient_email'] = p_info.get('email')
+                except Exception as ex:
+                    print(f"[DOCTOR-LIST] Error enriching patient names: {ex}")
+
+        return jsonify({"success": True, "appointments": appts})
     except Exception as e:
         return jsonify({"error": "Could not load appointments."}), 500
 

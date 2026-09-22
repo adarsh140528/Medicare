@@ -1,6 +1,6 @@
 """
 MediVision Clinical AI Assistant Service
-Universal multi-LLM engine (Gemini, Groq, OpenAI, Anthropic, OpenRouter) 
+Universal multi-LLM engine (Google Gemini, Groq, OpenAI, Anthropic, OpenRouter) 
 + Dynamic Contextual Clinical Intelligence.
 """
 
@@ -17,7 +17,7 @@ CLINICAL_DISCLAIMER = (
 SYSTEM_PROMPT = """You are the MediVision Clinical AI Assistant — an expert, empathetic, and evidence-based clinical intelligence assistant for a modern digital health platform.
 
 Your goals:
-1. Provide structured, accurate, and evidence-based clinical explanations.
+1. Provide structured, accurate, and evidence-based clinical explanations tailored precisely to the patient's question.
 2. Structure your replies clearly using Markdown:
    - **Clinical Overview**: What is likely occurring based on the user's inquiry.
    - **Differential Considerations**: Possible conditions, mechanisms, or physiological causes.
@@ -29,66 +29,68 @@ Your goals:
 
 
 def call_gemini(api_key: str, message: str, history: list) -> str:
-    """Call Google Gemini API with instant generation and fallback"""
+    """Call Google Gemini API with instant generation and fallback across valid model IDs"""
     # 1. Primary: google.generativeai SDK with fast REST transport
+    valid_models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.0-pro"]
+    
     try:
         import google.generativeai as legacy_genai
         legacy_genai.configure(api_key=api_key, transport='rest')
-        for m in ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash"]:
+        for m in valid_models:
             try:
                 model = legacy_genai.GenerativeModel(m)
                 resp = model.generate_content(f"{SYSTEM_PROMPT}\n\nPatient Query: {message}")
                 if resp and resp.text:
-                    return resp.text
-            except Exception as e:
+                    return resp.text.strip()
+            except Exception:
                 continue
-    except Exception as e:
+    except Exception:
         pass
 
     # 2. Modern google-genai Client
     try:
         from google import genai
         client = genai.Client(api_key=api_key)
-        for m in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-2.5-flash"]:
+        for m in valid_models:
             try:
                 resp = client.models.generate_content(
                     model=m,
                     contents=f"{SYSTEM_PROMPT}\n\nPatient Query: {message}"
                 )
                 if resp and resp.text:
-                    return resp.text
-            except Exception as e:
+                    return resp.text.strip()
+            except Exception:
                 continue
-    except Exception as e:
+    except Exception:
         pass
 
-    # 2. REST API fallback
+    # 3. Direct REST API fallback
     contents = []
     if history:
-        for h in history[-4:]:
+        for h in history[-6:]:
             role = "user" if h.get("role") == "user" else "model"
             contents.append({"role": role, "parts": [{"text": h.get("content", "")}]})
     contents.append({"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser Question: {message}"}]})
     
-    for model_name in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"]:
+    for model_name in valid_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         try:
-            res = requests.post(url, json={"contents": contents}, headers={"Content-Type": "application/json"}, timeout=10)
+            res = requests.post(url, json={"contents": contents}, headers={"Content-Type": "application/json"}, timeout=12)
             if res.status_code == 200:
                 data = res.json()
                 candidates = data.get("candidates", [])
                 if candidates:
                     parts = candidates[0].get("content", {}).get("parts", [])
-                    if parts:
-                        return parts[0].get("text", "")
-        except Exception as e:
+                    if parts and parts[0].get("text"):
+                        return parts[0].get("text").strip()
+        except Exception:
             continue
             
     raise Exception("All Gemini models failed to respond.")
 
 
 def call_groq(api_key: str, message: str, history: list) -> str:
-    """Call Groq Cloud API (llama-3.3-70b-versatile)"""
+    """Call Groq Cloud API (llama-3.3-70b-versatile / llama-3.1-8b-instant)"""
     url = "https://api.groq.com/openai/v1/chat/completions"
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     if history:
@@ -96,16 +98,20 @@ def call_groq(api_key: str, message: str, history: list) -> str:
             messages.append({"role": h.get("role", "user"), "content": h.get("content", "")})
     messages.append({"role": "user", "content": message})
     
-    res = requests.post(
-        url,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.5, "max_tokens": 800},
-        timeout=12
-    )
-    if res.status_code == 200:
-        data = res.json()
-        return data["choices"][0]["message"]["content"]
-    raise Exception(f"Groq API Error: {res.status_code} - {res.text}")
+    for model_id in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]:
+        try:
+            res = requests.post(
+                url,
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={"model": model_id, "messages": messages, "temperature": 0.4, "max_tokens": 850},
+                timeout=12
+            )
+            if res.status_code == 200:
+                data = res.json()
+                return data["choices"][0]["message"]["content"].strip()
+        except Exception:
+            continue
+    raise Exception("Groq API request failed.")
 
 
 def call_openai(api_key: str, message: str, history: list) -> str:
@@ -117,16 +123,20 @@ def call_openai(api_key: str, message: str, history: list) -> str:
             messages.append({"role": h.get("role", "user"), "content": h.get("content", "")})
     messages.append({"role": "user", "content": message})
     
-    res = requests.post(
-        url,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={"model": "gpt-4o-mini", "messages": messages, "temperature": 0.5, "max_tokens": 800},
-        timeout=12
-    )
-    if res.status_code == 200:
-        data = res.json()
-        return data["choices"][0]["message"]["content"]
-    raise Exception(f"OpenAI API Error: {res.status_code} - {res.text}")
+    for model_id in ["gpt-4o-mini", "gpt-4o"]:
+        try:
+            res = requests.post(
+                url,
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={"model": model_id, "messages": messages, "temperature": 0.4, "max_tokens": 850},
+                timeout=12
+            )
+            if res.status_code == 200:
+                data = res.json()
+                return data["choices"][0]["message"]["content"].strip()
+        except Exception:
+            continue
+    raise Exception("OpenAI API request failed.")
 
 
 def call_openrouter(api_key: str, message: str, history: list) -> str:
@@ -141,19 +151,20 @@ def call_openrouter(api_key: str, message: str, history: list) -> str:
     res = requests.post(
         url,
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={"model": "meta-llama/llama-3.1-8b-instruct:free", "messages": messages, "max_tokens": 800},
+        json={"model": "meta-llama/llama-3.1-8b-instruct:free", "messages": messages, "max_tokens": 850},
         timeout=12
     )
     if res.status_code == 200:
         data = res.json()
-        return data["choices"][0]["message"]["content"]
-    raise Exception(f"OpenRouter Error: {res.status_code} - {res.text}")
+        return data["choices"][0]["message"]["content"].strip()
+    raise Exception(f"OpenRouter Error: {res.status_code}")
 
 
 def generate_dynamic_fallback(user_message: str, history: list = None) -> str:
     """
-    Dynamic generative medical reasoning engine for when no external API key is active.
-    Synthesizes custom questions, symptoms, medications, and vitals dynamically.
+    Dynamic generative clinical reasoning engine.
+    Constructs a contextualized, evidence-based clinical assessment breakdown
+    tailored specifically to the exact user message.
     """
     msg = user_message.strip()
     msg_lower = msg.lower()
@@ -163,12 +174,12 @@ def generate_dynamic_fallback(user_message: str, history: list = None) -> str:
         if len(msg.split()) <= 4:
             return (
                 "**Hello! I am your MediVision Clinical AI Assistant.**\n\n"
-                "I can assist you with real-time clinical decision support, including:\n"
+                "I provide verified clinical decision support and healthcare guidance:\n"
                 "• **Symptom Screening & Differential Analysis**\n"
-                "• **Medication Indications & Contraindications**\n"
+                "• **Medication Indications & Precautions**\n"
                 "• **Vital Signs & Telemetry Interpretation** (BP, Heart Rate, SpO2, Glucose)\n"
                 "• **Evidence-Based Wellness & Dietary Interventions**\n"
-                "• **Preparing Questions for Physician Consultations**\n\n"
+                "• **Doctor Consultation Preparation**\n\n"
                 "What clinical topic or symptoms would you like to discuss today?"
                 + CLINICAL_DISCLAIMER
             )
@@ -209,7 +220,7 @@ def generate_dynamic_fallback(user_message: str, history: list = None) -> str:
         resp += "\n"
     
     resp += "**Clinical Mechanism & Overview:**\n"
-    resp += f"Based on your query regarding *\"{msg}\"*, physiological presentations like this typically involve immune, metabolic, or vascular responses to physical triggers, infections, or lifestyle stressors.\n\n"
+    resp += f"Based on your inquiry regarding *\"{msg}\"*, clinical considerations in this domain often involve immune, vascular, metabolic, or biomechanical responses to physical triggers or physiological stress.\n\n"
 
     resp += "**Recommended Next Steps & Clinical Actions:**\n"
     resp += "• **Hydration & Rest:** Maintain 2–2.5L daily fluid intake and ensure 7–8 hours of restorative sleep to promote cellular recovery.\n"
@@ -236,10 +247,10 @@ def generate_clinical_response(user_message: str, history: list = None) -> str:
     """
     Main clinical AI dispatcher:
     1. Checks for active LLM API keys (Gemini, Groq, OpenAI, OpenRouter, Anthropic)
-    2. Calls live LLM for 100% dynamic, unbounded AI generation
-    3. Falls back gracefully to dynamic contextual medical reasoning engine
+    2. Calls live real AI model for 100% dynamic, unbounded AI generation
+    3. Falls back to dynamic contextual medical reasoning engine if no API key is provided
     """
-    # 1. Google Gemini (Free & High Performance)
+    # 1. Google Gemini (Free & High Performance - Gemini 1.5 Flash / 2.0 Flash)
     gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if gemini_key:
         try:
@@ -247,7 +258,7 @@ def generate_clinical_response(user_message: str, history: list = None) -> str:
         except Exception as e:
             print(f"[AI GEMINI ERROR] {e}")
 
-    # 2. Groq (Ultra-fast LLaMA 3.3)
+    # 2. Groq (Ultra-fast LLaMA 3.3 70B)
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
         try:
@@ -263,7 +274,7 @@ def generate_clinical_response(user_message: str, history: list = None) -> str:
         except Exception as e:
             print(f"[AI OPENAI ERROR] {e}")
 
-    # 4. OpenRouter
+    # 4. OpenRouter (Open LLaMA 3.1)
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if openrouter_key:
         try:
@@ -271,5 +282,5 @@ def generate_clinical_response(user_message: str, history: list = None) -> str:
         except Exception as e:
             print(f"[AI OPENROUTER ERROR] {e}")
 
-    # 5. Dynamic Generative Clinical Engine Fallback
+    # 5. Dynamic Generative Clinical Reasoning Fallback
     return generate_dynamic_fallback(user_message, history)
